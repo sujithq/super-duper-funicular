@@ -11,25 +11,28 @@ public class SolarDataServiceTests
     public async Task LoadDataAsync_WithValidFile_ReturnsData()
     {
         // Arrange
-        var testData = new SolarData(new List<BarChartData>
+        var testData = new SolarData(new Dictionary<string, List<BarChartData>>
         {
-            new BarChartData(
-                Day: 1,
-                TotalProduction: 15.5,
-                TotalConsumption: 12.3,
-                GridInjection: 3.2,
-                JuneEnergyProcessed: true,
-                SunGrowProcessed: false,
-                WeatherStats: new MeteoStatData(8.6, 7.5, 10.1, 0.2, 0, 242, 29.7, 57.4, 1010, 0),
-                MeteoStatProcessed: true,
-                AnomalyStats: new AnomalyData(0, 0, 0, false),
-                QuarterlyData: new QuarterData(new(), new(), new(), new(), null, null, null),
-                IsComplete: true,
-                SunTimes: new SunRiseSet(DateTime.Parse("2023-01-01T07:37:48"), DateTime.Parse("2023-01-01T16:02:37"))
-            )
+            ["2023"] = new List<BarChartData>
+            {
+                new BarChartData(
+                    Day: 1,
+                    TotalProduction: 15.5,
+                    TotalConsumption: 12.3,
+                    GridInjection: 3.2,
+                    JuneEnergyProcessed: true,
+                    SunGrowProcessed: false,
+                    WeatherStats: new MeteoStatData(8.6, 7.5, 10.1, 0.2, 0, 242, 29.7, 57.4, 1010, 0),
+                    MeteoStatProcessed: true,
+                    AnomalyStats: new AnomalyData(0, 0, 0, false),
+                    QuarterlyData: new QuarterData(new(), new(), new(), new(), null, null, null),
+                    IsComplete: true,
+                    SunTimes: new SunRiseSet(DateTime.Parse("2023-01-01T07:37:48"), DateTime.Parse("2023-01-01T16:02:37"))
+                )
+            }
         });
 
-        var json = JsonSerializer.Serialize(new { _2023 = testData.Year2023 });
+        var json = JsonSerializer.Serialize(new { years = testData.Years });
         var tempFile = Path.GetTempFileName();
         await File.WriteAllTextAsync(tempFile, json);
 
@@ -42,6 +45,8 @@ public class SolarDataServiceTests
         Assert.NotNull(result);
         Assert.Single(result.Year2023);
         Assert.Equal(15.5, result.Year2023[0].TotalProduction);
+        Assert.Single(result.Years);
+        Assert.Contains("2023", result.Years.Keys);
 
         // Cleanup
         File.Delete(tempFile);
