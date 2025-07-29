@@ -1,7 +1,7 @@
 # 🌞 SolarScope CLI - Your Personal Solar System Command Center
 
 [![For the Love of Code 2025](https://img.shields.io/badge/For%20the%20Love%20of%20Code-2025-orange?style=flat-square)](https://github.blog/open-source/for-the-love-of-code-2025/)
-[![.NET 8.0](https://img.shields.io/badge/.NET-8.0-purple?style=flat-square)](https://dotnet.microsoft.com/download/dotnet/8.0)
+[![.NET 9.0](https://img.shields.io/badge/.NET-9.0-purple?style=flat-square)](https://dotnet.microsoft.com/download/dotnet/9.0)
 [![Spectre.Console](https://img.shields.io/badge/Spectre.Console-0.49.1-blue?style=flat-square)](https://spectreconsole.net/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
@@ -85,7 +85,7 @@ The tool analyzes your solar system data including:
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
-- .NET 8.0 SDK or later
+- .NET 9.0 SDK or later
 - Windows, macOS, or Linux
 - Terminal with Unicode support (recommended)
 
@@ -267,7 +267,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 ### Technologies Used
-- **[.NET 8.0](https://dotnet.microsoft.com/)** - Modern, cross-platform framework
+- **[.NET 9.0](https://dotnet.microsoft.com/)** - Modern, cross-platform framework
 - **[Spectre.Console](https://spectreconsole.net/)** - Beautiful console applications
 - **[CommandLineParser](https://github.com/commandlineparser/commandline)** - Command-line argument parsing
 - **[System.Text.Json](https://docs.microsoft.com/en-us/dotnet/api/system.text.json)** - High-performance JSON processing
