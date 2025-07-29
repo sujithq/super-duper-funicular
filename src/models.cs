@@ -236,26 +236,54 @@ public enum WindCondition
 /// Root data structure for yearly solar data
 /// </summary>
 public record SolarData(
-    [property: JsonPropertyName("2023")] List<BarChartData> Year2023
+    [property: JsonPropertyName("years")] Dictionary<string, List<BarChartData>> Years
 )
 {
     /// <summary>
-    /// Gets all available years of data
+    /// Gets all available years of data as integer keys
     /// </summary>
-    public Dictionary<int, List<BarChartData>> AllYears => new() { { 2023, Year2023 } };
+    public Dictionary<int, List<BarChartData>> AllYears => 
+        Years.ToDictionary(kvp => int.Parse(kvp.Key), kvp => kvp.Value);
     
     /// <summary>
-    /// Gets the total number of days with data
+    /// Gets data for 2023 (for backward compatibility)
     /// </summary>
-    public int TotalDays => Year2023.Count;
+    public List<BarChartData> Year2023 => Years.ContainsKey("2023") ? Years["2023"] : new List<BarChartData>();
     
     /// <summary>
-    /// Calculates yearly totals
+    /// Gets the total number of days with data across all years
+    /// </summary>
+    public int TotalDays => Years.Values.Sum(yearData => yearData.Count);
+    
+    /// <summary>
+    /// Calculates yearly totals for a specific year
+    /// </summary>
+    public (double Production, double Consumption, double Injection) GetYearlyTotals(int year)
+    {
+        var yearKey = year.ToString();
+        if (!Years.ContainsKey(yearKey))
+            return (0, 0, 0);
+            
+        var yearData = Years[yearKey];
+        return (
+            yearData.Sum(d => d.TotalProduction),
+            yearData.Sum(d => d.TotalConsumption),
+            yearData.Sum(d => d.GridInjection)
+        );
+    }
+    
+    /// <summary>
+    /// Calculates totals for all years combined
     /// </summary>
     public (double Production, double Consumption, double Injection) YearlyTotals =>
         (
-            Year2023.Sum(d => d.TotalProduction),
-            Year2023.Sum(d => d.TotalConsumption),
-            Year2023.Sum(d => d.GridInjection)
+            Years.Values.SelectMany(yearData => yearData).Sum(d => d.TotalProduction),
+            Years.Values.SelectMany(yearData => yearData).Sum(d => d.TotalConsumption),
+            Years.Values.SelectMany(yearData => yearData).Sum(d => d.GridInjection)
         );
+    
+    /// <summary>
+    /// Gets available years as a list
+    /// </summary>
+    public List<int> AvailableYears => Years.Keys.Select(int.Parse).OrderBy(y => y).ToList();
 };
