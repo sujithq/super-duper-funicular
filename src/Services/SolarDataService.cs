@@ -1,7 +1,45 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using SolarScope.Models;
 
 namespace SolarScope.Services;
+
+/// <summary>
+/// Custom JSON converter for SolarData to handle string to int key conversion
+/// </summary>
+public class SolarDataConverter : JsonConverter<SolarData>
+{
+    public override SolarData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var jsonDocument = JsonDocument.ParseValue(ref reader);
+        var result = new SolarData();
+        
+        foreach (var property in jsonDocument.RootElement.EnumerateObject())
+        {
+            if (int.TryParse(property.Name, out var year))
+            {
+                var yearData = JsonSerializer.Deserialize<List<BarChartData>>(property.Value.GetRawText(), options);
+                if (yearData != null)
+                {
+                    result[year] = yearData;
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public override void Write(Utf8JsonWriter writer, SolarData value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        foreach (var kvp in value)
+        {
+            writer.WritePropertyName(kvp.Key.ToString());
+            JsonSerializer.Serialize(writer, kvp.Value, options);
+        }
+        writer.WriteEndObject();
+    }
+}
 
 /// <summary>
 /// Service for loading and parsing solar system data
@@ -17,7 +55,8 @@ public class SolarDataService
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Converters = { new SolarDataConverter() }
         };
     }
 
@@ -47,13 +86,12 @@ public class SolarDataService
     /// </summary>
     public List<BarChartData> GetDataForDateRange(SolarData data, int year, int startDay, int endDay)
     {
-        var yearKey = year.ToString();
-        if (!data.Years.ContainsKey(yearKey))
+        if (!data.ContainsKey(year))
             return new List<BarChartData>();
             
-        return data.Years[yearKey]
-            .Where(d => d.Day >= startDay && d.Day <= endDay)
-            .OrderBy(d => d.Day)
+        return data[year]
+            .Where(d => d.D >= startDay && d.D <= endDay)
+            .OrderBy(d => d.D)
             .ToList();
     }
 
@@ -71,13 +109,12 @@ public class SolarDataService
     /// </summary>
     public List<BarChartData> GetAnomalousData(SolarData data, int year, AnomalySeverity minSeverity = AnomalySeverity.Low)
     {
-        var yearKey = year.ToString();
-        if (!data.Years.ContainsKey(yearKey))
+        if (!data.ContainsKey(year))
             return new List<BarChartData>();
             
-        return data.Years[yearKey]
-            .Where(d => d.AnomalyStats.Severity >= minSeverity)
-            .OrderByDescending(d => d.AnomalyStats.TotalAnomalyScore)
+        return data[year]
+            .Where(d => d.AS.Severity >= minSeverity)
+            .OrderByDescending(d => d.AS.TotalAnomalyScore)
             .ToList();
     }
 
@@ -86,10 +123,10 @@ public class SolarDataService
     /// </summary>
     public List<BarChartData> GetAnomalousData(SolarData data, AnomalySeverity minSeverity = AnomalySeverity.Low)
     {
-        return data.Years.Values
+        return data.Values
             .SelectMany(yearData => yearData)
-            .Where(d => d.AnomalyStats.Severity >= minSeverity)
-            .OrderByDescending(d => d.AnomalyStats.TotalAnomalyScore)
+            .Where(d => d.AS.Severity >= minSeverity)
+            .OrderByDescending(d => d.AS.TotalAnomalyScore)
             .ToList();
     }
 
@@ -98,12 +135,11 @@ public class SolarDataService
     /// </summary>
     public List<BarChartData> GetTopProductionDays(SolarData data, int year, int count = 10)
     {
-        var yearKey = year.ToString();
-        if (!data.Years.ContainsKey(yearKey))
+        if (!data.ContainsKey(year))
             return new List<BarChartData>();
             
-        return data.Years[yearKey]
-            .OrderByDescending(d => d.TotalProduction)
+        return data[year]
+            .OrderByDescending(d => d.P)
             .Take(count)
             .ToList();
     }
@@ -113,9 +149,9 @@ public class SolarDataService
     /// </summary>
     public List<BarChartData> GetTopProductionDays(SolarData data, int count = 10)
     {
-        return data.Years.Values
+        return data.Values
             .SelectMany(yearData => yearData)
-            .OrderByDescending(d => d.TotalProduction)
+            .OrderByDescending(d => d.P)
             .Take(count)
             .ToList();
     }
@@ -125,13 +161,12 @@ public class SolarDataService
     /// </summary>
     public List<BarChartData> GetWorstWeatherDays(SolarData data, int year, int count = 10)
     {
-        var yearKey = year.ToString();
-        if (!data.Years.ContainsKey(yearKey))
+        if (!data.ContainsKey(year))
             return new List<BarChartData>();
             
-        return data.Years[yearKey]
-            .OrderBy(d => d.WeatherStats.SunshineHours)
-            .ThenByDescending(d => d.WeatherStats.Precipitation)
+        return data[year]
+            .OrderBy(d => d.MS.SunshineHours)
+            .ThenByDescending(d => d.MS.Precipitation)
             .Take(count)
             .ToList();
     }
@@ -141,10 +176,10 @@ public class SolarDataService
     /// </summary>
     public List<BarChartData> GetWorstWeatherDays(SolarData data, int count = 10)
     {
-        return data.Years.Values
+        return data.Values
             .SelectMany(yearData => yearData)
-            .OrderBy(d => d.WeatherStats.SunshineHours)
-            .ThenByDescending(d => d.WeatherStats.Precipitation)
+            .OrderBy(d => d.MS.SunshineHours)
+            .ThenByDescending(d => d.MS.Precipitation)
             .Take(count)
             .ToList();
     }
@@ -154,14 +189,13 @@ public class SolarDataService
     /// </summary>
     public Dictionary<int, MonthlyStats> GetMonthlyStatistics(SolarData data, int year)
     {
-        var yearKey = year.ToString();
-        if (!data.Years.ContainsKey(yearKey))
+        if (!data.ContainsKey(year))
             return new Dictionary<int, MonthlyStats>();
             
         var monthlyStats = new Dictionary<int, MonthlyStats>();
         
         // Group by month (assuming day of year)
-        var grouped = data.Years[yearKey].GroupBy(d => (d.Day - 1) / 30 + 1); // Rough month approximation
+        var grouped = data[year].GroupBy(d => (d.D - 1) / 30 + 1); // Rough month approximation
         
         foreach (var monthGroup in grouped)
         {
@@ -171,13 +205,13 @@ public class SolarDataService
             monthlyStats[month] = new MonthlyStats(
                 month,
                 days.Count,
-                days.Sum(d => d.TotalProduction),
-                days.Sum(d => d.TotalConsumption),
-                days.Sum(d => d.GridInjection),
-                days.Average(d => d.WeatherStats.AverageTemp),
-                days.Sum(d => d.WeatherStats.Precipitation),
-                days.Sum(d => d.WeatherStats.SunshineHours),
-                days.Count(d => d.AnomalyStats.HasAnomaly)
+                days.Sum(d => d.P),
+                days.Sum(d => d.U),
+                days.Sum(d => d.I),
+                days.Average(d => d.MS.AverageTemp),
+                days.Sum(d => d.MS.Precipitation),
+                days.Sum(d => d.MS.SunshineHours),
+                days.Count(d => d.AS.HasAnomaly)
             );
         }
         
@@ -198,33 +232,32 @@ public class SolarDataService
     /// </summary>
     public WeatherCorrelationAnalysis AnalyzeWeatherCorrelation(SolarData data, int year)
     {
-        var yearKey = year.ToString();
-        if (!data.Years.ContainsKey(yearKey))
+        if (!data.ContainsKey(year))
             return new WeatherCorrelationAnalysis(0, 0, 0, 0);
             
-        var validDays = data.Years[yearKey].Where(d => d.TotalProduction > 0).ToList();
+        var validDays = data[year].Where(d => d.P > 0).ToList();
         
         if (validDays.Count < 2) return new WeatherCorrelationAnalysis(0, 0, 0, 0);
         
         // Simple correlation calculation
         var sunshineCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.SunshineHours).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.SunshineHours).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         var temperatureCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.AverageTemp).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.AverageTemp).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         var precipitationCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.Precipitation).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.Precipitation).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         var windCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.WindSpeed).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.WindSpeed).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         return new WeatherCorrelationAnalysis(sunshineCorrelation, temperatureCorrelation, precipitationCorrelation, windCorrelation);
@@ -235,32 +268,32 @@ public class SolarDataService
     /// </summary>
     public WeatherCorrelationAnalysis AnalyzeWeatherCorrelation(SolarData data)
     {
-        var validDays = data.Years.Values
+        var validDays = data.Values
             .SelectMany(yearData => yearData)
-            .Where(d => d.TotalProduction > 0)
+            .Where(d => d.P > 0)
             .ToList();
         
         if (validDays.Count < 2) return new WeatherCorrelationAnalysis(0, 0, 0, 0);
         
         // Simple correlation calculation
         var sunshineCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.SunshineHours).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.SunshineHours).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         var temperatureCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.AverageTemp).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.AverageTemp).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         var precipitationCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.Precipitation).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.Precipitation).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         var windCorrelation = CalculateCorrelation(
-            validDays.Select(d => d.WeatherStats.WindSpeed).ToArray(),
-            validDays.Select(d => d.TotalProduction).ToArray()
+            validDays.Select(d => d.MS.WindSpeed).ToArray(),
+            validDays.Select(d => d.P).ToArray()
         );
         
         return new WeatherCorrelationAnalysis(sunshineCorrelation, temperatureCorrelation, precipitationCorrelation, windCorrelation);

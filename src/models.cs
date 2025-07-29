@@ -6,29 +6,29 @@ namespace SolarScope.Models;
 /// Represents a daily solar system and weather data entry
 /// </summary>
 public record BarChartData(
-    [property: JsonPropertyName("D")] int Day,
-    [property: JsonPropertyName("P")] double TotalProduction,
-    [property: JsonPropertyName("U")] double TotalConsumption,
-    [property: JsonPropertyName("I")] double GridInjection,
-    [property: JsonPropertyName("J")] bool JuneEnergyProcessed,
-    [property: JsonPropertyName("S")] bool SunGrowProcessed,
-    [property: JsonPropertyName("MS")] MeteoStatData WeatherStats,
-    [property: JsonPropertyName("M")] bool MeteoStatProcessed,
-    [property: JsonPropertyName("AS")] AnomalyData AnomalyStats,
-    [property: JsonPropertyName("Q")] QuarterData QuarterlyData,
-    [property: JsonPropertyName("C")] bool IsComplete = false,
-    [property: JsonPropertyName("SRS")] SunRiseSet SunTimes = default!
+    [property: JsonPropertyName("D")] int D,
+    [property: JsonPropertyName("P")] double P,
+    [property: JsonPropertyName("U")] double U,
+    [property: JsonPropertyName("I")] double I,
+    [property: JsonPropertyName("J")] bool J,
+    [property: JsonPropertyName("S")] bool S,
+    [property: JsonPropertyName("MS")] MeteoStatData MS,
+    [property: JsonPropertyName("M")] bool M,
+    [property: JsonPropertyName("AS")] AnomalyData AS,
+    [property: JsonPropertyName("Q")] QuarterData Q,
+    [property: JsonPropertyName("C")] bool C = false,
+    [property: JsonPropertyName("SRS")] SunRiseSet SRS = default!
 )
 {
     /// <summary>
     /// Calculates the energy efficiency as a percentage
     /// </summary>
-    public double Efficiency => TotalProduction > 0 ? (TotalConsumption / TotalProduction) * 100 : 0;
+    public double Efficiency => P > 0 ? (U / P) * 100 : 0;
     
     /// <summary>
     /// Calculates the energy surplus/deficit
     /// </summary>
-    public double EnergyBalance => TotalProduction - TotalConsumption;
+    public double EnergyBalance => P - U;
     
     /// <summary>
     /// Determines if this day had net energy production (surplus)
@@ -38,12 +38,12 @@ public record BarChartData(
     /// <summary>
     /// Gets the peak quarter-hourly production value
     /// </summary>
-    public double PeakProduction => QuarterlyData.ConsumptionReadings.Count > 0 ? QuarterlyData.ConsumptionReadings.Max() : 0;
+    public double PeakProduction => Q.ProductionReadings.Count > 0 ? Q.ProductionReadings.Max() : 0;
     
     /// <summary>
     /// Gets the average quarter-hourly production
     /// </summary>
-    public double AverageProduction => QuarterlyData.ConsumptionReadings.Count > 0 ? QuarterlyData.ConsumptionReadings.Average() : 0;
+    public double AverageProduction => Q.ProductionReadings.Count > 0 ? Q.ProductionReadings.Average() : 0;
 };
 
 /// <summary>
@@ -235,40 +235,41 @@ public enum WindCondition
 /// <summary>
 /// Root data structure for yearly solar data
 /// </summary>
-public record SolarData(
-    [property: JsonPropertyName("years")] Dictionary<string, List<BarChartData>> Years
-)
+public class SolarData : Dictionary<int, List<BarChartData>>
 {
     /// <summary>
-    /// Gets all available years of data as integer keys
+    /// Gets data for a specific year
     /// </summary>
-    public Dictionary<int, List<BarChartData>> AllYears => 
-        Years.ToDictionary(kvp => int.Parse(kvp.Key), kvp => kvp.Value);
+    public List<BarChartData> GetYearData(int year) => this.ContainsKey(year) ? this[year] : new List<BarChartData>();
     
     /// <summary>
-    /// Gets data for 2023 (for backward compatibility)
+    /// Gets data for the most recent year available
     /// </summary>
-    public List<BarChartData> Year2023 => Years.ContainsKey("2023") ? Years["2023"] : new List<BarChartData>();
+    public List<BarChartData> GetLatestYearData() => AvailableYears.Count > 0 ? this[AvailableYears.Last()] : new List<BarChartData>();
+    
+    /// <summary>
+    /// Gets the most recent year available
+    /// </summary>
+    public int LatestYear => AvailableYears.Count > 0 ? AvailableYears.Last() : DateTime.Now.Year;
     
     /// <summary>
     /// Gets the total number of days with data across all years
     /// </summary>
-    public int TotalDays => Years.Values.Sum(yearData => yearData.Count);
+    public int TotalDays => this.Values.Sum(yearData => yearData.Count);
     
     /// <summary>
     /// Calculates yearly totals for a specific year
     /// </summary>
     public (double Production, double Consumption, double Injection) GetYearlyTotals(int year)
     {
-        var yearKey = year.ToString();
-        if (!Years.ContainsKey(yearKey))
+        if (!this.ContainsKey(year))
             return (0, 0, 0);
             
-        var yearData = Years[yearKey];
+        var yearData = this[year];
         return (
-            yearData.Sum(d => d.TotalProduction),
-            yearData.Sum(d => d.TotalConsumption),
-            yearData.Sum(d => d.GridInjection)
+            yearData.Sum(d => d.P),
+            yearData.Sum(d => d.U),
+            yearData.Sum(d => d.I)
         );
     }
     
@@ -277,13 +278,13 @@ public record SolarData(
     /// </summary>
     public (double Production, double Consumption, double Injection) YearlyTotals =>
         (
-            Years.Values.SelectMany(yearData => yearData).Sum(d => d.TotalProduction),
-            Years.Values.SelectMany(yearData => yearData).Sum(d => d.TotalConsumption),
-            Years.Values.SelectMany(yearData => yearData).Sum(d => d.GridInjection)
+            this.Values.SelectMany(yearData => yearData).Sum(d => d.P),
+            this.Values.SelectMany(yearData => yearData).Sum(d => d.U),
+            this.Values.SelectMany(yearData => yearData).Sum(d => d.I)
         );
     
     /// <summary>
     /// Gets available years as a list
     /// </summary>
-    public List<int> AvailableYears => Years.Keys.Select(int.Parse).OrderBy(y => y).ToList();
-};
+    public List<int> AvailableYears => this.Keys.OrderBy(y => y).ToList();
+}

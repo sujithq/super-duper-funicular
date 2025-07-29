@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SolarScope": {
+      "commandName": "Project",
+      "commandLineArgs": "-- dashboard"
+    }
+  }
+}

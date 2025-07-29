@@ -70,7 +70,7 @@ public class AnalyzeCommand
 
         foreach (var day in topDays)
         {
-            var color = day.TotalProduction switch
+            var color = day.P switch
             {
                 > 20 => Color.Green,
                 > 15 => Color.Lime,
@@ -78,7 +78,7 @@ public class AnalyzeCommand
                 _ => Color.Orange1
             };
             
-            chart.AddItem($"Day {day.Day}", day.TotalProduction, color);
+            chart.AddItem($"Day {day.D}", day.P, color);
         }
 
         AnsiConsole.Write(chart);
@@ -89,7 +89,7 @@ public class AnalyzeCommand
             .Border(TableBorder.Rounded)
             .BorderColor(Color.Green);
 
-        table.AddColumn("[bold]Day[/]");
+        table.AddColumn("[bold]D[/]");
         table.AddColumn("[bold]Production (kWh)[/]");
         table.AddColumn("[bold]Consumption (kWh)[/]");
         table.AddColumn("[bold]Balance[/]");
@@ -103,12 +103,12 @@ public class AnalyzeCommand
             var balanceText = $"[{balanceColor}]{balance:+0.0;-0.0} kWh[/]";
             
             table.AddRow(
-                $"Day {day.Day}",
-                $"[green]{day.TotalProduction:F1}[/]",
-                $"[blue]{day.TotalConsumption:F1}[/]",
+                $"Day {day.D}",
+                $"[green]{day.P:F1}[/]",
+                $"[blue]{day.U:F1}[/]",
                 balanceText,
-                $"{day.Efficiency:F1}%",
-                GetWeatherSummary(day.WeatherStats)
+                $"[yellow]{day.Efficiency:F1}%[/]",
+                $"[cyan]{GetWeatherEmoji(day.MS.Condition)}[/]"
             );
         }
 
@@ -126,15 +126,16 @@ public class AnalyzeCommand
 
     private async Task AnalyzeWeather(SolarDataService dataService, SolarData data, AnalyzeOptions options)
     {
-        var worstWeatherDays = dataService.GetWorstWeatherDays(data, options.Count);
+        var latestYear = data.LatestYear;
+        var worstWeatherDays = dataService.GetWorstWeatherDays(data, latestYear, options.Count);
         
         // Weather conditions breakdown
         var weatherBreakdown = new BreakdownChart()
             .Width(50)
             .ShowPercentage();
 
-        var conditionGroups = data.Year2023
-            .GroupBy(d => d.WeatherStats.Condition)
+        var conditionGroups = data.GetLatestYearData()
+            .GroupBy(d => d.MS.Condition)
             .OrderByDescending(g => g.Count());
 
         foreach (var group in conditionGroups)
@@ -176,15 +177,15 @@ public class AnalyzeCommand
 
         foreach (var day in worstWeatherDays)
         {
-            var productionImpact = day.TotalProduction < 5 ? "[red]High Impact[/]" : 
-                                 day.TotalProduction < 10 ? "[yellow]Medium Impact[/]" : "[green]Low Impact[/]";
+            var productionImpact = day.P < 5 ? "[red]High Impact[/]" : 
+                                 day.P < 10 ? "[yellow]Medium Impact[/]" : "[green]Low Impact[/]";
             
             table.AddRow(
-                $"Day {day.Day}",
-                $"{day.WeatherStats.SunshineHours:F1}",
-                $"{day.WeatherStats.Precipitation:F1}",
-                $"{day.WeatherStats.AverageTemp:F1}",
-                $"{day.WeatherStats.WindSpeed:F1}",
+                $"Day {day.D}",
+                $"{day.MS.SunshineHours:F1}",
+                $"{day.MS.Precipitation:F1}",
+                $"{day.MS.AverageTemp:F1}",
+                $"{day.MS.WindSpeed:F1}",
                 productionImpact
             );
         }
@@ -223,7 +224,7 @@ public class AnalyzeCommand
             .Label("[red bold]Anomaly Severity Distribution[/]")
             .CenterLabel();
 
-        var severityGroups = anomalousData.GroupBy(d => d.AnomalyStats.Severity);
+        var severityGroups = anomalousData.GroupBy(d => d.AS.Severity);
         foreach (var group in severityGroups)
         {
             var color = group.Key switch
@@ -245,7 +246,7 @@ public class AnalyzeCommand
             .Border(TableBorder.Rounded)
             .BorderColor(Color.Red);
 
-        table.AddColumn("[bold]Day[/]");
+        table.AddColumn("[bold]D[/]");
         table.AddColumn("[bold]Severity[/]");
         table.AddColumn("[bold]Production Anomaly[/]");
         table.AddColumn("[bold]Consumption Anomaly[/]");
@@ -254,7 +255,7 @@ public class AnalyzeCommand
 
         foreach (var day in anomalousData.Take(options.Count))
         {
-            var severityColor = day.AnomalyStats.Severity switch
+            var severityColor = day.AS.Severity switch
             {
                 AnomalySeverity.High => "red",
                 AnomalySeverity.Medium => "orange",
@@ -263,11 +264,11 @@ public class AnalyzeCommand
             };
 
             table.AddRow(
-                $"Day {day.Day}",
-                $"[{severityColor}]{day.AnomalyStats.Severity}[/]",
-                $"{day.AnomalyStats.ProductionAnomaly:F2}",
-                $"{day.AnomalyStats.ConsumptionAnomaly:F2}",
-                $"[bold]{day.AnomalyStats.TotalAnomalyScore:F2}[/]",
+                $"Day {day.D}",
+                $"[{severityColor}]{day.AS.Severity}[/]",
+                $"{day.AS.ProductionAnomaly:F2}",
+                $"{day.AS.ConsumptionAnomaly:F2}",
+                $"[bold]{day.AS.TotalAnomalyScore:F2}[/]",
                 GetPotentialCause(day)
             );
         }
@@ -364,8 +365,8 @@ public class AnalyzeCommand
     {
         AnsiConsole.WriteLine();
         
-        var avgProduction = days.Average(d => d.TotalProduction);
-        var maxProduction = days.Max(d => d.TotalProduction);
+        var avgProduction = days.Average(d => d.P);
+        var maxProduction = days.Max(d => d.P);
         var avgEfficiency = days.Average(d => d.Efficiency);
         
         var stats = new Panel(new Markup(
@@ -386,17 +387,18 @@ public class AnalyzeCommand
     {
         AnsiConsole.WriteLine();
         
-        var weatherData = data.Year2023.Select(d => d.WeatherStats).ToList();
+        var latestYearData = data.GetLatestYearData();
+        var weatherData = latestYearData.Select(d => d.MS).ToList();
         var avgTemp = weatherData.Average(w => w.AverageTemp);
         var totalPrecip = weatherData.Sum(w => w.Precipitation);
         var totalSunshine = weatherData.Sum(w => w.SunshineHours);
-        var sunnyDays = data.Year2023.Count(d => d.WeatherStats.Condition == WeatherCondition.Sunny);
+        var sunnyDays = latestYearData.Count(d => d.MS.Condition == WeatherCondition.Sunny);
         
         var stats = new Panel(new Markup(
             $"[yellow]🌡️ Average Temperature: {avgTemp:F1}°C[/]\n" +
             $"[blue]🌧️ Total Precipitation: {totalPrecip:F1}mm[/]\n" +
             $"[orange]☀️ Total Sunshine: {totalSunshine:F1} hours[/]\n" +
-            $"[green]🌞 Sunny Days: {sunnyDays} ({(double)sunnyDays/data.TotalDays*100:F1}%)[/]"))
+            $"[green]🌞 Sunny Days: {sunnyDays} ({(double)sunnyDays/latestYearData.Count*100:F1}%)[/]"))
         {
             Header = new PanelHeader("[bold]Weather Statistics[/]"),
             Border = BoxBorder.Rounded,
@@ -410,7 +412,7 @@ public class AnalyzeCommand
     {
         AnsiConsole.WriteLine();
         
-        var highSeverityCount = anomalies.Count(a => a.AnomalyStats.Severity == AnomalySeverity.High);
+        var highSeverityCount = anomalies.Count(a => a.AS.Severity == AnomalySeverity.High);
         var recommendations = new List<string>();
 
         if (highSeverityCount > 0)
@@ -463,10 +465,10 @@ public class AnalyzeCommand
 
     private static string GetPotentialCause(BarChartData day)
     {
-        if (day.WeatherStats.Precipitation > 5) return "Heavy rain";
-        if (day.WeatherStats.SunshineHours < 2) return "Low sunshine";
-        if (day.AnomalyStats.ConsumptionAnomaly > 5) return "High consumption";
-        if (day.AnomalyStats.ProductionAnomaly < -5) return "Low production";
+        if (day.MS.Precipitation > 5) return "Heavy rain";
+        if (day.MS.SunshineHours < 2) return "Low sunshine";
+        if (day.AS.ConsumptionAnomaly > 5) return "High consumption";
+        if (day.AS.ProductionAnomaly < -5) return "Low production";
         return "System issue";
     }
 
@@ -482,5 +484,18 @@ public class AnalyzeCommand
         
         var direction = correlation > 0 ? "positive" : "negative";
         return $"{strength} {direction} correlation ({correlation:F3})";
+    }
+
+    private static string GetWeatherEmoji(WeatherCondition condition)
+    {
+        return condition switch
+        {
+            WeatherCondition.Sunny => "☀️",
+            WeatherCondition.PartlyCloudy => "⛅",
+            WeatherCondition.Cloudy => "☁️",
+            WeatherCondition.Overcast => "🌫️",
+            WeatherCondition.Rainy => "🌧️",
+            _ => "❓"
+        };
     }
 }

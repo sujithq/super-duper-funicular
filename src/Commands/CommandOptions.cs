@@ -52,8 +52,20 @@ public class AnalyzeOptions : BaseOptions
 [Verb("report", HelpText = "Generate detailed reports")]
 public class ReportOptions : BaseOptions
 {
+    [Option('p', "period", Required = false, Default = "monthly", HelpText = "Report period: daily, weekly, monthly, yearly")]
+    public string Period { get; set; } = "monthly";
+
     [Option('t', "type", Required = false, Default = "monthly", HelpText = "Report type: daily, weekly, monthly, yearly")]
     public string ReportType { get; set; } = "monthly";
+
+    [Option('y', "year", Required = false, HelpText = "Year to analyze (default: latest available year)")]
+    public int? Year { get; set; }
+
+    [Option('s', "start-day", Required = false, HelpText = "Start day for analysis (day of year)")]
+    public int? StartDay { get; set; }
+
+    [Option('e', "end-day", Required = false, HelpText = "End day for analysis (day of year)")]
+    public int? EndDay { get; set; }
 
     [Option('o', "output", Required = false, HelpText = "Output file path (optional)")]
     public string? OutputFile { get; set; }
@@ -73,6 +85,9 @@ public class AnomaliesOptions : BaseOptions
 
     [Option('i', "interactive", Required = false, Default = false, HelpText = "Interactive anomaly explorer")]
     public bool Interactive { get; set; }
+
+    [Option('y', "year", Required = false, HelpText = "Year to analyze (default: latest available year)")]
+    public int? Year { get; set; }
 }
 
 /// <summary>
@@ -81,6 +96,12 @@ public class AnomaliesOptions : BaseOptions
 [Verb("weather", HelpText = "Weather analysis and correlation")]
 public class WeatherOptions : BaseOptions
 {
+    [Option('a', "analysis", Required = false, Default = "overview", HelpText = "Analysis type: overview, correlation, patterns, recommendations")]
+    public string Analysis { get; set; } = "overview";
+
+    [Option('y', "year", Required = false, HelpText = "Year to analyze (default: latest available year)")]
+    public int? Year { get; set; }
+
     [Option('c', "correlation", Required = false, Default = false, HelpText = "Show weather-production correlation")]
     public bool ShowCorrelation { get; set; }
 
@@ -96,6 +117,9 @@ public class ExploreOptions : BaseOptions
 {
     [Option('m', "mode", Required = false, Default = "full", HelpText = "Exploration mode: full, quick, guided")]
     public string Mode { get; set; } = "full";
+
+    [Option('y', "year", Required = false, HelpText = "Year to analyze (default: latest available year)")]
+    public int? Year { get; set; }
 }
 
 /// <summary>

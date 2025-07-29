@@ -121,9 +121,10 @@ public class DashboardCommand
     private void DisplayKeyStatistics(SolarData data)
     {
         var (totalProduction, totalConsumption, totalInjection) = data.YearlyTotals;
-        var averageDaily = data.Year2023.Average(d => d.TotalProduction);
-        var bestDay = data.Year2023.MaxBy(d => d.TotalProduction);
-        var anomalyCount = data.Year2023.Count(d => d.AnomalyStats.HasAnomaly);
+        var latestYearData = data.GetLatestYearData();
+        var averageDaily = latestYearData.Average(d => d.P);
+        var bestDay = latestYearData.MaxBy(d => d.P);
+        var anomalyCount = latestYearData.Count(d => d.AS.HasAnomaly);
 
         var statsTable = new Table()
             .Border(TableBorder.Rounded)
@@ -159,8 +160,8 @@ public class DashboardCommand
         );
         
         statsTable.AddRow(
-            "Best Production Day", 
-            $"[green]Day {bestDay?.Day} ({bestDay?.TotalProduction:F2} kWh)[/]", 
+            "Best Production D", 
+            $"[green]D {bestDay?.D} ({bestDay?.P:F2} kWh)[/]", 
             "🏆"
         );
         
@@ -222,11 +223,11 @@ public class DashboardCommand
             .CenterLabel();
 
         // Get last 20 days for chart
-        var recentDays = data.Year2023.TakeLast(20).ToList();
+        var recentDays = data.GetLatestYearData().TakeLast(20).ToList();
         
         foreach (var day in recentDays)
         {
-            var color = day.TotalProduction switch
+            var color = day.P switch
             {
                 > 15 => Color.Green,
                 > 10 => Color.Yellow,
@@ -234,7 +235,7 @@ public class DashboardCommand
                 _ => Color.Red
             };
             
-            chart.AddItem($"Day {day.Day}", day.TotalProduction, color);
+            chart.AddItem($"D {day.D}", day.P, color);
         }
 
         AnsiConsole.Write(chart);
@@ -242,7 +243,7 @@ public class DashboardCommand
 
     private void DisplayWeatherSummary(SolarData data)
     {
-        var weatherData = data.Year2023.Select(d => d.WeatherStats).ToList();
+        var weatherData = data.GetLatestYearData().Select(d => d.MS).ToList();
         var avgTemp = weatherData.Average(w => w.AverageTemp);
         var totalPrecip = weatherData.Sum(w => w.Precipitation);
         var avgSunshine = weatherData.Average(w => w.SunshineHours);
@@ -271,8 +272,8 @@ public class DashboardCommand
 
     private void DisplayAnomalySummary(SolarData data)
     {
-        var anomalies = data.Year2023.Where(d => d.AnomalyStats.HasAnomaly).ToList();
-        var severityGroups = anomalies.GroupBy(d => d.AnomalyStats.Severity).ToList();
+        var anomalies = data.GetLatestYearData().Where(d => d.AS.HasAnomaly).ToList();
+        var severityGroups = anomalies.GroupBy(d => d.AS.Severity).ToList();
 
         var anomalyChart = new BreakdownChart()
             .Width(40)
