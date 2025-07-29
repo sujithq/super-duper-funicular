@@ -181,7 +181,7 @@ public class DemoCommand
         await TypewriterEffect("📊 Visualizing energy production patterns...", speed);
         AnsiConsole.WriteLine();
 
-        var recentDays = data.Year2023.TakeLast(10).ToList();
+        var recentDays = data.GetLatestYearData().TakeLast(10).ToList();
         
         await AnsiConsole.Live(new Panel("Initializing..."))
             .StartAsync(async ctx =>
@@ -195,19 +195,19 @@ public class DemoCommand
 
                     foreach (var day in recentDays.Take(i))
                     {
-                        var color = day.TotalProduction switch
+                        var color = day.P switch
                         {
                             > 15 => Color.Green,
                             > 10 => Color.Yellow,
                             _ => Color.Orange1
                         };
                         
-                        chart.AddItem($"Day {day.Day}", day.TotalProduction, color);
+                        chart.AddItem($"D {day.D}", day.P, color);
                     }
 
                     var panel = new Panel(chart)
                     {
-                        Header = new PanelHeader($"[bold]Loading Day {i}/10[/]"),
+                        Header = new PanelHeader($"[bold]Loading D {i}/10[/]"),
                         Border = BoxBorder.Rounded
                     };
 
@@ -233,20 +233,20 @@ public class DemoCommand
             [WeatherCondition.Rainy] = "🌧️"
         };
 
-        var weatherDays = data.Year2023.Take(7).ToList();
+        var weatherDays = data.GetLatestYearData().Take(7).ToList();
         
         foreach (var day in weatherDays)
         {
-            var emoji = weatherEmojis[day.WeatherStats.Condition];
-            var productionBar = new string('█', (int)(day.TotalProduction / 2));
-            var color = day.TotalProduction switch
+            var emoji = weatherEmojis[day.MS.Condition];
+            var productionBar = new string('█', (int)(day.P / 2));
+            var color = day.P switch
             {
                 > 15 => "green",
                 > 10 => "yellow",
                 _ => "red"
             };
 
-            AnsiConsole.MarkupLine($"{emoji} Day {day.Day}: [{color}]{productionBar}[/] {day.TotalProduction:F1} kWh");
+            AnsiConsole.MarkupLine($"{emoji} D {day.D}: [{color}]{productionBar}[/] {day.P:F1} kWh");
             await Task.Delay(speed * 4);
         }
         
@@ -330,7 +330,7 @@ public class DemoCommand
             $"[green]TOTAL_CONSUMPTION: {totalConsumption:F2} KWH[/]",
             $"[green]GRID_INJECTION: {totalInjection:F2} KWH[/]",
             $"[green]SYSTEM_STATUS: OPTIMAL[/]",
-            $"[green]ANOMALIES_DETECTED: {data.Year2023.Count(d => d.AnomalyStats.HasAnomaly)}[/]",
+            $"[green]ANOMALIES_DETECTED: {data.GetLatestYearData().Count(d => d.AS.HasAnomaly)}[/]",
             $"[green]EFFICIENCY_RATING: HIGH[/]"
         };
 
@@ -415,7 +415,7 @@ public class DemoCommand
         AnsiConsole.WriteLine();
 
         var colors = new[] { Color.Red, Color.Orange1, Color.Yellow, Color.Green, Color.Cyan1, Color.Blue, Color.Magenta1 };
-        var recentDays = data.Year2023.TakeLast(7).ToList();
+        var recentDays = data.GetLatestYearData().TakeLast(7).ToList();
         
         var chart = new BarChart()
             .Width(70)
@@ -426,7 +426,7 @@ public class DemoCommand
         {
             var day = recentDays[i];
             var color = colors[i % colors.Length];
-            chart.AddItem($"Day {day.Day}", day.TotalProduction, color);
+            chart.AddItem($"D {day.D}", day.P, color);
         }
 
         AnsiConsole.Write(chart);
