@@ -9,27 +9,22 @@ namespace SolarScope.Commands;
 /// </summary>
 public class DashboardCommand
 {
-    private readonly SolarDataService _dataService;
-
-    public DashboardCommand()
-    {
-        _dataService = new SolarDataService();
-    }
-
     public async Task ExecuteAsync(DashboardOptions options)
     {
+        SolarDataService dataService = null!;
+        
         await AnsiConsole.Status()
             .Spinner(Spinner.Known.Star)
             .SpinnerStyle(Style.Parse("yellow"))
             .StartAsync("Loading solar data...", async ctx =>
             {
-                _dataService = new SolarDataService(options.DataFile);
+                dataService = new SolarDataService(options.DataFile);
                 
                 ctx.Status("Analyzing data...");
                 await Task.Delay(500); // Simulated processing for dramatic effect
             });
 
-        var data = await _dataService.LoadDataAsync();
+        var data = await dataService.LoadDataAsync();
         if (data == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
@@ -235,7 +230,7 @@ public class DashboardCommand
             {
                 > 15 => Color.Green,
                 > 10 => Color.Yellow,
-                > 5 => Color.Orange,
+                > 5 => Color.Orange1,
                 _ => Color.Red
             };
             
@@ -289,7 +284,7 @@ public class DashboardCommand
             var color = group.Key switch
             {
                 AnomalySeverity.High => Color.Red,
-                AnomalySeverity.Medium => Color.Orange,
+                AnomalySeverity.Medium => Color.Orange1,
                 AnomalySeverity.Low => Color.Yellow,
                 _ => Color.Green
             };

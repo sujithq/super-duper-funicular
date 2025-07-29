@@ -9,13 +9,6 @@ namespace SolarScope.Commands;
 /// </summary>
 public class DemoCommand
 {
-    private readonly SolarDataService _dataService;
-
-    public DemoCommand()
-    {
-        _dataService = new SolarDataService();
-    }
-
     public async Task ExecuteAsync(DemoOptions options)
     {
         var dataService = new SolarDataService(options.DataFile);
@@ -206,7 +199,7 @@ public class DemoCommand
                         {
                             > 15 => Color.Green,
                             > 10 => Color.Yellow,
-                            _ => Color.Orange
+                            _ => Color.Orange1
                         };
                         
                         chart.AddItem($"Day {day.Day}", day.TotalProduction, color);
@@ -421,7 +414,7 @@ public class DemoCommand
         await TypewriterEffect("🎨 Creating rainbow energy visualization...", speed);
         AnsiConsole.WriteLine();
 
-        var colors = new[] { Color.Red, Color.Orange1, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta };
+        var colors = new[] { Color.Red, Color.Orange1, Color.Yellow, Color.Green, Color.Cyan1, Color.Blue, Color.Magenta1 };
         var recentDays = data.Year2023.TakeLast(7).ToList();
         
         var chart = new BarChart()

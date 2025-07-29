@@ -10,10 +10,10 @@ public record BarChartData(
     [property: JsonPropertyName("P")] double TotalProduction,
     [property: JsonPropertyName("U")] double TotalConsumption,
     [property: JsonPropertyName("I")] double GridInjection,
-    [property: JsonPropertyName("J")] bool HasJanuary,
-    [property: JsonPropertyName("S")] bool HasSummer,
+    [property: JsonPropertyName("J")] bool JuneEnergyProcessed,
+    [property: JsonPropertyName("S")] bool SunGrowProcessed,
     [property: JsonPropertyName("MS")] MeteoStatData WeatherStats,
-    [property: JsonPropertyName("M")] bool HasMeasurements,
+    [property: JsonPropertyName("M")] bool MeteoStatProcessed,
     [property: JsonPropertyName("AS")] AnomalyData AnomalyStats,
     [property: JsonPropertyName("Q")] QuarterData QuarterlyData,
     [property: JsonPropertyName("C")] bool IsComplete = false,
@@ -38,12 +38,12 @@ public record BarChartData(
     /// <summary>
     /// Gets the peak quarter-hourly production value
     /// </summary>
-    public double PeakProduction => QuarterlyData.C.Count > 0 ? QuarterlyData.C.Max() : 0;
+    public double PeakProduction => QuarterlyData.ConsumptionReadings.Count > 0 ? QuarterlyData.ConsumptionReadings.Max() : 0;
     
     /// <summary>
     /// Gets the average quarter-hourly production
     /// </summary>
-    public double AverageProduction => QuarterlyData.C.Count > 0 ? QuarterlyData.C.Average() : 0;
+    public double AverageProduction => QuarterlyData.ConsumptionReadings.Count > 0 ? QuarterlyData.ConsumptionReadings.Average() : 0;
 };
 
 /// <summary>

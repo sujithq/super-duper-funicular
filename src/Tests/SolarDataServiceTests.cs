@@ -1,6 +1,7 @@
 using SolarScope.Models;
 using SolarScope.Services;
 using System.Text.Json;
+using Xunit;
 
 namespace SolarScope.Tests;
 
@@ -17,10 +18,10 @@ public class SolarDataServiceTests
                 TotalProduction: 15.5,
                 TotalConsumption: 12.3,
                 GridInjection: 3.2,
-                HasJanuary: true,
-                HasSummer: false,
+                JuneEnergyProcessed: true,
+                SunGrowProcessed: false,
                 WeatherStats: new MeteoStatData(8.6, 7.5, 10.1, 0.2, 0, 242, 29.7, 57.4, 1010, 0),
-                HasMeasurements: true,
+                MeteoStatProcessed: true,
                 AnomalyStats: new AnomalyData(0, 0, 0, false),
                 QuarterlyData: new QuarterData(new(), new(), new(), new(), null, null, null),
                 IsComplete: true,
@@ -55,10 +56,10 @@ public class SolarDataServiceTests
             TotalProduction: 20.0,
             TotalConsumption: 15.0,
             GridInjection: 5.0,
-            HasJanuary: true,
-            HasSummer: false,
+            JuneEnergyProcessed: true,
+            SunGrowProcessed: false,
             WeatherStats: new MeteoStatData(25.0, 20.0, 30.0, 0, 0, 180, 10, 20, 1013, 8),
-            HasMeasurements: true,
+            MeteoStatProcessed: true,
             AnomalyStats: new AnomalyData(0, 0, 0, false),
             QuarterlyData: new QuarterData(new List<double> { 0.5, 1.0, 1.5 }, new(), new(), new(), null, null, null)
         );

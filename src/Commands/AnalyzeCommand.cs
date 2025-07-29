@@ -9,13 +9,6 @@ namespace SolarScope.Commands;
 /// </summary>
 public class AnalyzeCommand
 {
-    private readonly SolarDataService _dataService;
-
-    public AnalyzeCommand()
-    {
-        _dataService = new SolarDataService();
-    }
-
     public async Task ExecuteAsync(AnalyzeOptions options)
     {
         var dataService = new SolarDataService(options.DataFile);
@@ -82,7 +75,7 @@ public class AnalyzeCommand
                 > 20 => Color.Green,
                 > 15 => Color.Lime,
                 > 10 => Color.Yellow,
-                _ => Color.Orange
+                _ => Color.Orange1
             };
             
             chart.AddItem($"Day {day.Day}", day.TotalProduction, color);
@@ -149,9 +142,9 @@ public class AnalyzeCommand
             var color = group.Key switch
             {
                 WeatherCondition.Sunny => Color.Yellow,
-                WeatherCondition.PartlyCloudy => Color.Orange,
+                WeatherCondition.PartlyCloudy => Color.Orange1,
                 WeatherCondition.Cloudy => Color.Grey,
-                WeatherCondition.Overcast => Color.DarkGrey,
+                WeatherCondition.Overcast => Color.DarkGreen,
                 WeatherCondition.Rainy => Color.Blue,
                 _ => Color.White
             };
@@ -236,7 +229,7 @@ public class AnalyzeCommand
             var color = group.Key switch
             {
                 AnomalySeverity.High => Color.Red,
-                AnomalySeverity.Medium => Color.Orange,
+                AnomalySeverity.Medium => Color.Orange1,
                 AnomalySeverity.Low => Color.Yellow,
                 _ => Color.Green
             };
@@ -315,7 +308,7 @@ public class AnalyzeCommand
             {
                 > 0.7 => Color.Green,
                 > 0.5 => Color.Yellow,
-                > 0.3 => Color.Orange,
+                > 0.3 => Color.Orange1,
                 _ => Color.Red
             };
             
@@ -328,7 +321,7 @@ public class AnalyzeCommand
         // Detailed correlation table
         var table = new Table()
             .Border(TableBorder.Rounded)
-            .BorderColor(Color.Cyan);
+            .BorderColor(Color.Cyan1);
 
         table.AddColumn("[bold]Weather Factor[/]");
         table.AddColumn("[bold]Correlation[/]");
