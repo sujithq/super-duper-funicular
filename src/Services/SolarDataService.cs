@@ -49,7 +49,7 @@ public class SolarDataService
     private readonly string _dataFilePath;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    public SolarDataService(string dataFilePath = "data/sample.json")
+    public SolarDataService(string dataFilePath)
     {
         _dataFilePath = dataFilePath;
         _jsonOptions = new JsonSerializerOptions
@@ -67,12 +67,20 @@ public class SolarDataService
     {
         try
         {
-            if (!File.Exists(_dataFilePath))
+            string jsonContent;
+            if (_dataFilePath.StartsWith("http://") || _dataFilePath.StartsWith("https://"))
             {
-                throw new FileNotFoundException($"Data file not found: {_dataFilePath}");
+                using var httpClient = new HttpClient();
+                jsonContent = await httpClient.GetStringAsync(_dataFilePath);
             }
-
-            var jsonContent = await File.ReadAllTextAsync(_dataFilePath);
+            else
+            {
+                if (!File.Exists(_dataFilePath))
+                {
+                    throw new FileNotFoundException($"Data file not found: {_dataFilePath}");
+                }
+                jsonContent = await File.ReadAllTextAsync(_dataFilePath);
+            }
             return JsonSerializer.Deserialize<SolarData>(jsonContent, _jsonOptions);
         }
         catch (Exception ex)
@@ -207,7 +215,7 @@ public class SolarDataService
                 days.Count,
                 days.Sum(d => d.P),
                 days.Sum(d => d.U),
-                days.Sum(d => d.I),
+                days.Sum(d => d.I/1000),
                 days.Average(d => d.MS.AverageTemp),
                 days.Sum(d => d.MS.Precipitation),
                 days.Sum(d => d.MS.SunshineHours),

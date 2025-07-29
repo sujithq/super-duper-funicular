@@ -94,9 +94,9 @@ public class WeatherCommand
 
         AnsiConsole.Write(weatherChart);
 
-        // Weather statistics table
+        // Weather statistics table (use ASCII border for compatibility)
         var statsTable = new Table()
-            .Border(TableBorder.Rounded)
+            .Border(TableBorder.Ascii)
             .Title($"[bold]Weather Statistics - Year {selectedYear}[/]")
             .AddColumn("[yellow]Metric[/]")
             .AddColumn("[green]Value[/]");
@@ -371,7 +371,7 @@ public class WeatherCommand
             .AddColumn("[yellow]Month[/]")
             .AddColumn("[red]Avg Temp[/]")
             .AddColumn("[blue]Precipitation[/]")
-            .AddColumn("[orange]Sunshine[/]")
+            .AddColumn("[orange1]Sunshine[/]")
             .AddColumn("[green]Avg Production[/]");
 
         foreach (var month in monthlyWeather)
@@ -422,7 +422,7 @@ public class WeatherCommand
             .AddColumn("[yellow]Season[/]")
             .AddColumn("[red]Avg Temp[/]")
             .AddColumn("[blue]Total Precip[/]")
-            .AddColumn("[orange]Total Sunshine[/]")
+            .AddColumn("[orange1]Total Sunshine[/]")
             .AddColumn("[green]Avg Production[/]");
 
         foreach (var (season, months) in seasons)
@@ -475,7 +475,7 @@ public class WeatherCommand
             "[yellow]🔧 Seasonal Maintenance Recommendations:[/]\n\n" +
             "[green]Spring:[/] Clean panels after winter, check for damage from storms\n" +
             "[red]Summer:[/] Monitor for overheating, ensure adequate ventilation\n" +
-            "[orange]Autumn:[/] Clear debris and leaves, prepare for reduced daylight\n" +
+            "[orange1]Autumn:[/] Clear debris and leaves, prepare for reduced daylight\n" +
             "[blue]Winter:[/] Remove snow accumulation, check for ice damage"))
         {
             Header = new PanelHeader("[bold]Seasonal Maintenance Guide[/]"),
@@ -517,7 +517,7 @@ public class WeatherCommand
         }
         else if (correlation.SunshineCorrelation < 0.5)
         {
-            recommendations.Add("[orange]☁️ Low sunshine correlation suggests potential issues[/]\n" +
+            recommendations.Add("[orange1]☁️ Low sunshine correlation suggests potential issues[/]\n" +
                               "   • Check for panel soiling or degradation\n" +
                               "   • Verify inverter performance and efficiency\n" +
                               "   • Consider professional system inspection");
@@ -571,7 +571,7 @@ public class WeatherCommand
 
         if (efficiency < 80)
         {
-            recommendations.Add("[orange]📉 System efficiency could be improved[/]\n" +
+            recommendations.Add("[orange1]📉 System efficiency could be improved[/]\n" +
                               "   • Optimize energy consumption patterns\n" +
                               "   • Consider battery storage for excess production\n" +
                               "   • Review appliance usage during peak production");

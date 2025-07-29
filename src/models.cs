@@ -1,4 +1,4 @@
-    using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace SolarScope.Models;
 
@@ -269,7 +269,7 @@ public class SolarData : Dictionary<int, List<BarChartData>>
         return (
             yearData.Sum(d => d.P),
             yearData.Sum(d => d.U),
-            yearData.Sum(d => d.I)
+            yearData.Sum(d => d.I/1000)
         );
     }
     
@@ -280,7 +280,7 @@ public class SolarData : Dictionary<int, List<BarChartData>>
         (
             this.Values.SelectMany(yearData => yearData).Sum(d => d.P),
             this.Values.SelectMany(yearData => yearData).Sum(d => d.U),
-            this.Values.SelectMany(yearData => yearData).Sum(d => d.I)
+            this.Values.SelectMany(yearData => yearData).Sum(d => d.I/1000)
         );
     
     /// <summary>

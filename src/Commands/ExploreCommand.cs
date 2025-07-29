@@ -72,7 +72,7 @@ public class ExploreCommand
             $"[green]📊 Year {selectedYear} Quick Stats[/]\n\n" +
             $"[white]Total Production: {totalProd:F2} kWh[/]\n" +
             $"[blue]Total Consumption: {totalCons:F2} kWh[/]\n" +
-            $"[orange]Grid Injection: {totalInj:F2} kWh[/]\n" +
+            $"[orange1]Grid Injection: {totalInj:F2} kWh[/]\n" +
             $"[yellow]Daily Average: {avgDaily:F2} kWh[/]\n\n" +
             $"[green]🏆 Best D: D {bestDay.D} ({bestDay.P:F2} kWh)[/]\n" +
             $"[red]⚠️ Worst D: D {worstDay.D} ({worstDay.P:F2} kWh)[/]"))
@@ -132,7 +132,7 @@ public class ExploreCommand
         var anomalies = dataService.GetAnomalousData(data, selectedYear);
         var anomalyPanel = new Panel(new Markup(
             $"[red]⚠️ Anomalies Detected: {anomalies.Count}[/]\n" +
-            $"[orange]High Severity: {anomalies.Count(a => a.AS.Severity == AnomalySeverity.High)}[/]\n" +
+            $"[orange1]High Severity: {anomalies.Count(a => a.AS.Severity == AnomalySeverity.High)}[/]\n" +
             $"[yellow]Medium Severity: {anomalies.Count(a => a.AS.Severity == AnomalySeverity.Medium)}[/]\n" +
             $"[green]Low Severity: {anomalies.Count(a => a.AS.Severity == AnomalySeverity.Low)}[/]"))
         {
@@ -311,7 +311,7 @@ public class ExploreCommand
         var metricsPanel = new Panel(new Markup(
             $"[green]🔋 Total Production: {totalProd:F2} kWh[/]\n" +
             $"[blue]⚡ Total Consumption: {totalCons:F2} kWh[/]\n" +
-            $"[orange]🏠 Grid Injection: {totalInj:F2} kWh[/]\n" +
+            $"[orange1]🏠 Grid Injection: {totalInj:F2} kWh[/]\n" +
             $"[yellow]📊 System Efficiency: {efficiency:F1}%[/]\n" +
             $"[white]🏡 Self-Consumption: {selfConsumption:F1}%[/]\n" +
             $"[gray]📅 Daily Average: {avgDaily:F2} kWh[/]\n" +
@@ -495,7 +495,7 @@ public class ExploreCommand
         var anomalyPanel = new Panel(new Markup(
             $"[red]🚨 Total Anomalies: {anomalies.Count}[/]\n" +
             $"[darkred]High Severity: {severityBreakdown.GetValueOrDefault(AnomalySeverity.High, 0)}[/]\n" +
-            $"[orange]Medium Severity: {severityBreakdown.GetValueOrDefault(AnomalySeverity.Medium, 0)}[/]\n" +
+            $"[orange1]Medium Severity: {severityBreakdown.GetValueOrDefault(AnomalySeverity.Medium, 0)}[/]\n" +
             $"[yellow]Low Severity: {severityBreakdown.GetValueOrDefault(AnomalySeverity.Low, 0)}[/]"))
         {
             Header = new PanelHeader("[bold]Anomaly Summary[/]"),
@@ -569,7 +569,7 @@ public class ExploreCommand
             $"[yellow]🔋 High Efficiency Days (>90%): {highEfficiencyDays}[/]\n" +
             $"[red]⚠️ Low Efficiency Days (<50%): {lowEfficiencyDays}[/]\n" +
             $"[blue]📈 Best Efficiency: {efficiencyData.First().Efficiency:F1}% (D {efficiencyData.First().Day})[/]\n" +
-            $"[orange]📉 Worst Efficiency: {efficiencyData.Last().Efficiency:F1}% (D {efficiencyData.Last().Day})[/]"))
+            $"[orange1]📉 Worst Efficiency: {efficiencyData.Last().Efficiency:F1}% (D {efficiencyData.Last().Day})[/]"))
         {
             Header = new PanelHeader("[bold]Efficiency Metrics[/]"),
             Border = BoxBorder.Rounded,
@@ -632,7 +632,7 @@ public class ExploreCommand
             .AddColumn("[yellow]Month[/]")
             .AddColumn("[green]Production[/]")
             .AddColumn("[blue]Consumption[/]")
-            .AddColumn("[orange]Injection[/]")
+            .AddColumn("[orange1]Injection[/]")
             .AddColumn("[white]Avg Temp[/]")
             .AddColumn("[cyan]Sunshine[/]")
             .AddColumn("[red]Anomalies[/]");
@@ -701,7 +701,7 @@ public class ExploreCommand
         var overviewPanel = new Panel(new Markup(
             $"[green]⚡ Production: {dayData.P:F2} kWh[/]\n" +
             $"[blue]🏠 Consumption: {dayData.U:F2} kWh[/]\n" +
-            $"[orange]🔌 Grid Injection: {dayData.I:F2} kWh[/]\n" +
+            $"[orange1]🔌 Grid Injection: {dayData.I:F2} kWh[/]\n" +
             $"[yellow]📊 Efficiency: {dayData.Efficiency:F1}%[/]\n" +
             $"[white]⚖️ Energy Balance: {dayData.EnergyBalance:F2} kWh[/]\n" +
             $"[purple]📈 Peak Production: {dayData.PeakProduction:F2} kWh[/]"))
@@ -715,7 +715,7 @@ public class ExploreCommand
             $"[yellow]🌤️ Condition: {dayData.MS.Condition}[/]\n" +
             $"[red]🌡️ Temperature: {dayData.MS.AverageTemp:F1}°C ({dayData.MS.MinTemp:F1}°C - {dayData.MS.MaxTemp:F1}°C)[/]\n" +
             $"[blue]🌧️ Precipitation: {dayData.MS.Precipitation:F1}mm[/]\n" +
-            $"[orange]☀️ Sunshine: {dayData.MS.SunshineHours:F1} hours[/]\n" +
+            $"[orange1]☀️ Sunshine: {dayData.MS.SunshineHours:F1} hours[/]\n" +
             $"[gray]💨 Wind: {dayData.MS.WindSpeed:F1} km/h ({dayData.MS.WindCondition})[/]\n" +
             $"[white]🔽 Pressure: {dayData.MS.Pressure:F1} hPa[/]"))
         {
@@ -741,7 +741,7 @@ public class ExploreCommand
                 $"[yellow]Total Score: {dayData.AS.TotalAnomalyScore:F2}[/]\n" +
                 $"[green]Production Anomaly: {dayData.AS.ProductionAnomaly:F2}[/]\n" +
                 $"[blue]Consumption Anomaly: {dayData.AS.ConsumptionAnomaly:F2}[/]\n" +
-                $"[orange]Injection Anomaly: {dayData.AS.InjectionAnomaly:F2}[/]"))
+                $"[orange1]Injection Anomaly: {dayData.AS.InjectionAnomaly:F2}[/]"))
             {
                 Header = new PanelHeader("[bold red]Anomaly Analysis[/]"),
                 Border = BoxBorder.Rounded,

@@ -92,7 +92,7 @@ public class AnomaliesCommand
             .AddColumn("[red]Severity[/]")
             .AddColumn("[green]Production[/]")
             .AddColumn("[blue]Consumption[/]")
-            .AddColumn("[orange]Injection[/]")
+            .AddColumn("[orange1]Injection[/]")
             .AddColumn("[white]Score[/]")
             .AddColumn("[cyan]Weather[/]");
 
@@ -111,7 +111,7 @@ public class AnomaliesCommand
                 $"[{severityColor}]{anomaly.AS.Severity}[/]",
                 $"{anomaly.P:F2} kWh",
                 $"{anomaly.U:F2} kWh",
-                $"{anomaly.I:F2} kWh",
+                $"{(anomaly.I / 1000.0):F2} kWh",
                 $"{anomaly.AS.TotalAnomalyScore:F2}",
                 anomaly.MS.Condition.ToString()
             );
@@ -163,7 +163,7 @@ public class AnomaliesCommand
             $"[green]High Production Anomalies: {highProdAnomalies}[/]\n" +
             $"[red]Low Production Anomalies: {lowProdAnomalies}[/]\n" +
             $"[blue]High Consumption Anomalies: {highConsAnomalies}[/]\n" +
-            $"[orange]Low Consumption Anomalies: {lowConsAnomalies}[/]\n\n" +
+            $"[orange1]Low Consumption Anomalies: {lowConsAnomalies}[/]\n\n" +
             $"[yellow]Most Common Weather During Anomalies: {weatherPatterns.First().Condition}[/]\n" +
             $"[gray]Peak Anomaly Score: {anomalies.Max(a => a.AS.TotalAnomalyScore):F2}[/]"))
         {
@@ -411,7 +411,7 @@ public class AnomaliesCommand
             $"[white]Status: {anomalyStatus}[/]\n" +
             $"[green]Production: {dayData.P:F2} kWh[/]\n" +
             $"[blue]Consumption: {dayData.U:F2} kWh[/]\n" +
-            $"[orange]Grid Injection: {dayData.I:F2} kWh[/]\n" +
+            $"[orange1]Grid Injection: {dayData.I:F2} kWh[/]\n" +
             $"[gray]Energy Balance: {dayData.EnergyBalance:F2} kWh[/]"))
         {
             Header = new PanelHeader("[bold]D Overview[/]"),
@@ -426,7 +426,7 @@ public class AnomaliesCommand
             $"[yellow]Condition: {dayData.MS.Condition}[/]\n" +
             $"[white]Temperature: {dayData.MS.AverageTemp:F1}°C ({dayData.MS.MinTemp:F1}°C - {dayData.MS.MaxTemp:F1}°C)[/]\n" +
             $"[blue]Precipitation: {dayData.MS.Precipitation:F1}mm[/]\n" +
-            $"[orange]Sunshine: {dayData.MS.SunshineHours:F1} hours[/]\n" +
+            $"[orange1]Sunshine: {dayData.MS.SunshineHours:F1} hours[/]\n" +
             $"[gray]Wind: {dayData.MS.WindSpeed:F1} km/h ({dayData.MS.WindCondition})[/]"))
         {
             Header = new PanelHeader("[bold]Weather Details[/]"),
@@ -443,7 +443,7 @@ public class AnomaliesCommand
                 $"[red]Anomaly Score: {dayData.AS.TotalAnomalyScore:F2}[/]\n" +
                 $"[green]Production Anomaly: {dayData.AS.ProductionAnomaly:F2}[/]\n" +
                 $"[blue]Consumption Anomaly: {dayData.AS.ConsumptionAnomaly:F2}[/]\n" +
-                $"[orange]Injection Anomaly: {dayData.AS.InjectionAnomaly:F2}[/]"))
+                $"[orange1]Injection Anomaly: {dayData.AS.InjectionAnomaly:F2}[/]"))
             {
                 Header = new PanelHeader("[bold red]Anomaly Analysis[/]"),
                 Border = BoxBorder.Rounded,
@@ -459,7 +459,7 @@ public class AnomaliesCommand
             $"[yellow]Peak Production: {dayData.PeakProduction:F2} kWh[/]\n" +
             $"[white]Average Production: {dayData.AverageProduction:F2} kWh[/]\n" +
             $"[blue]Peak Demand Hour: {dayData.Q.PeakDemandHour:F1}[/]\n" +
-            $"[orange]Peak Generation Hour: {dayData.Q.PeakGenerationHour:F1}[/]"))
+            $"[orange1]Peak Generation Hour: {dayData.Q.PeakGenerationHour:F1}[/]"))
         {
             Header = new PanelHeader("[bold]Performance Metrics[/]"),
             Border = BoxBorder.Rounded,
