@@ -25,7 +25,7 @@ Thank you for your interest in contributing to SolarScope CLI! This project was 
 ## 🛠️ Development Setup
 
 ### Prerequisites
-- .NET 8.0 SDK or later
+- .NET 9.0 SDK or later
 - Git
 - Your favorite C# IDE (Visual Studio, VS Code, JetBrains Rider)
 

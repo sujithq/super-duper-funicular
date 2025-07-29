@@ -20,11 +20,11 @@ SolarScope CLI is a beautiful, interactive command-line tool for monitoring and 
 
 ## Technology Stack
 
-- **.NET 8.0** - Modern, cross-platform framework
-- **C# 12** - Latest language features with records and pattern matching
+- **.NET 9.0** - Modern, cross-platform framework
+- **C# 13** - Latest language features with records and pattern matching
 - **Spectre.Console 0.49.1** - Beautiful terminal UI with charts and animations
 - **CommandLineParser 2.9.1** - Robust command-line argument parsing
-- **System.Text.Json 8.0.0** - High-performance JSON processing
+- **System.Text.Json 9.0.7** - High-performance JSON processing
 
 ## Architecture Principles
 

@@ -8,7 +8,7 @@ echo.
 REM Check if .NET is installed
 dotnet --version >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-    echo ❌ .NET SDK not found. Please install .NET 8.0 or later.
+    echo ❌ .NET SDK not found. Please install .NET 9.0 or later.
     echo    Download from: https://dotnet.microsoft.com/download
     exit /b 1
 )

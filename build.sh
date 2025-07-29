@@ -8,7 +8,7 @@ echo ""
 
 # Check if .NET is installed
 if ! command -v dotnet &> /dev/null; then
-    echo "❌ .NET SDK not found. Please install .NET 8.0 or later."
+    echo "❌ .NET SDK not found. Please install .NET 9.0 or later."
     echo "   Download from: https://dotnet.microsoft.com/download"
     exit 1
 fi
