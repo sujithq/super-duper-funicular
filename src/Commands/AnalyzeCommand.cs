@@ -335,7 +335,7 @@ public class AnalyzeCommand
             {
                 > 0.7 => "[green]Strong[/]",
                 > 0.5 => "[yellow]Moderate[/]",
-                > 0.3 => "[orange]Weak[/]",
+                > 0.3 => "[orange1]Weak[/]",
                 _ => "[red]Very Weak[/]"
             };
 
@@ -343,7 +343,7 @@ public class AnalyzeCommand
             
             table.AddRow(
                 kvp.Key,
-                $"{kvp.Value:F3}",
+                $"{kvp.Value.ToString("F3", System.Globalization.CultureInfo.InvariantCulture)}",
                 strength,
                 impact
             );
@@ -397,7 +397,7 @@ public class AnalyzeCommand
         var stats = new Panel(new Markup(
             $"[yellow]🌡️ Average Temperature: {avgTemp:F1}°C[/]\n" +
             $"[blue]🌧️ Total Precipitation: {totalPrecip:F1}mm[/]\n" +
-            $"[orange]☀️ Total Sunshine: {totalSunshine:F1} hours[/]\n" +
+            $"[orange1]☀️ Total Sunshine: {totalSunshine:F1} hours[/]\n" +
             $"[green]🌞 Sunny Days: {sunnyDays} ({(double)sunnyDays/latestYearData.Count*100:F1}%)[/]"))
         {
             Header = new PanelHeader("[bold]Weather Statistics[/]"),

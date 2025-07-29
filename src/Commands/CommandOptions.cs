@@ -7,8 +7,9 @@ namespace SolarScope.Commands;
 /// </summary>
 public class BaseOptions
 {
-    [Option('d', "data", Required = false, Default = "data/sample.json", HelpText = "Path to the solar data JSON file")]
-    public string DataFile { get; set; } = "data/sample.json";
+    private const string DefaultDataUrl = "https://raw.githubusercontent.com/sujithq/myenergy/refs/heads/main/src/myenergy/wwwroot/Data/data.json";
+    [Option('d', "data", Required = false, Default = DefaultDataUrl, HelpText = "Path or URL to the solar data JSON file")]
+    public string DataFile { get; set; } = DefaultDataUrl;
 
     [Option('v', "verbose", Required = false, Default = false, HelpText = "Enable verbose output")]
     public bool Verbose { get; set; }

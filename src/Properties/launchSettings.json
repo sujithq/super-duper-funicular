@@ -2,7 +2,19 @@
   "profiles": {
     "SolarScope": {
       "commandName": "Project",
-      "commandLineArgs": "-- dashboard"
+      "commandLineArgs": "dashboard"
+    },
+    "SolarScope Dashboard Animated": {
+      "commandName": "Project",
+      "commandLineArgs": "dashboard --animated"
+    },
+    "SolarScope Weather": {
+      "commandName": "Project",
+      "commandLineArgs": "weather --analysis overview"
+    },
+    "SolarScope Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
     }
   }
 }

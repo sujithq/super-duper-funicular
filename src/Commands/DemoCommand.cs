@@ -136,7 +136,8 @@ public class DemoCommand
     {
         foreach (char c in text)
         {
-            AnsiConsole.Markup(c.ToString());
+            // Always escape the character to prevent malformed markup
+            AnsiConsole.Markup(Markup.Escape(c.ToString()));
             await Task.Delay(speed / 10);
         }
         if (newLine) AnsiConsole.WriteLine();
@@ -444,11 +445,11 @@ public class DemoCommand
             AnsiConsole.Clear();
             var rotated = rainbow.Substring(i % rainbow.Length) + rainbow.Substring(0, i % rainbow.Length);
             
-            AnsiConsole.Write(Align.Center(new Markup($"[bold]{rotated}[/]")));
+            AnsiConsole.Write(Align.Center(new Markup("[bold]{rotated}[/]")));
             AnsiConsole.WriteLine();
-            AnsiConsole.Write(Align.Center(new Markup("[bold rainbow]SOLAR RAINBOW COMPLETE![/]")));
+            AnsiConsole.Write(Align.Center(new Markup("[bold magenta]SOLAR RAINBOW COMPLETE![/]")));
             AnsiConsole.WriteLine();
-            AnsiConsole.Write(Align.Center(new Markup($"[bold]{rotated}[/]")));
+            AnsiConsole.Write(Align.Center(new Markup("[bold]{rotated}[/]")));
             
             await Task.Delay(speed * 2);
         }

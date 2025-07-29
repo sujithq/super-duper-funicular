@@ -107,7 +107,7 @@ public class ReportCommand
 
         var totalProduction = filteredData.Sum(d => d.P);
         var totalConsumption = filteredData.Sum(d => d.U);
-        var totalInjection = filteredData.Sum(d => d.I);
+        var totalInjection = filteredData.Sum(d => d.I/1000);
         var avgDaily = filteredData.Average(d => d.P);
         var maxDaily = filteredData.Max(d => d.P);
         var minDaily = filteredData.Min(d => d.P);
@@ -166,7 +166,7 @@ public class ReportCommand
                 Days = g.ToList(),
                 TotalProduction = g.Sum(d => d.P),
                 TotalConsumption = g.Sum(d => d.U),
-                TotalInjection = g.Sum(d => d.I),
+                TotalInjection = g.Sum(d => d.I/1000),
                 AvgProduction = g.Average(d => d.P),
                 DayCount = g.Count()
             })
@@ -267,8 +267,9 @@ public class ReportCommand
                 > 200 => Color.Orange1,
                 _ => Color.Red
             };
-            
-            monthlyChart.AddItem(monthNames[month.Key], month.Value.TotalProduction, color);
+            // Safe month name lookup
+            string monthLabel = (month.Key >= 1 && month.Key <= 12) ? monthNames[month.Key] : $"M{month.Key}";
+            monthlyChart.AddItem(monthLabel, month.Value.TotalProduction, color);
         }
 
         AnsiConsole.Write(monthlyChart);
@@ -280,7 +281,7 @@ public class ReportCommand
             .AddColumn("[yellow]Month[/]")
             .AddColumn("[green]Production[/]")
             .AddColumn("[blue]Consumption[/]")
-            .AddColumn("[orange]Injection[/]")
+            .AddColumn("[orange1]Injection[/]")
             .AddColumn("[white]Avg Temp[/]")
             .AddColumn("[cyan]Sunshine[/]")
             .AddColumn("[red]Anomalies[/]");
@@ -288,8 +289,9 @@ public class ReportCommand
         foreach (var month in monthlyStats.OrderBy(m => m.Key))
         {
             var stats = month.Value;
+            string monthLabel2 = (month.Key >= 1 && month.Key <= 12) ? monthNames[month.Key] : $"M{month.Key}";
             monthlyTable.AddRow(
-                monthNames[month.Key],
+                monthLabel2,
                 $"{stats.TotalProduction:F1} kWh",
                 $"{stats.TotalConsumption:F1} kWh",
                 $"{stats.TotalInjection:F1} kWh",
@@ -305,9 +307,12 @@ public class ReportCommand
         var bestMonth = monthlyStats.OrderByDescending(m => m.Value.TotalProduction).First();
         var worstMonth = monthlyStats.OrderBy(m => m.Value.TotalProduction).First();
 
+        string bestMonthLabel = (bestMonth.Key >= 1 && bestMonth.Key <= 12) ? monthNames[bestMonth.Key] : $"M{bestMonth.Key}";
+        string worstMonthLabel = (worstMonth.Key >= 1 && worstMonth.Key <= 12) ? monthNames[worstMonth.Key] : $"M{worstMonth.Key}";
+
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine($"[bold green]🏆 Best Month: {monthNames[bestMonth.Key]}[/] - {bestMonth.Value.TotalProduction:F2} kWh");
-        AnsiConsole.MarkupLine($"[bold red]⚠️ Worst Month: {monthNames[worstMonth.Key]}[/] - {worstMonth.Value.TotalProduction:F2} kWh");
+        AnsiConsole.MarkupLine($"[bold green]🏆 Best Month: {bestMonthLabel}[/] - {bestMonth.Value.TotalProduction:F2} kWh");
+        AnsiConsole.MarkupLine($"[bold red]⚠️ Worst Month: {worstMonthLabel}[/] - {worstMonth.Value.TotalProduction:F2} kWh");
     }
 
     private async Task DisplayYearlyReport(SolarData data, ReportOptions options)

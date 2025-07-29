@@ -11,6 +11,9 @@ public class DashboardCommand
 {
     public async Task ExecuteAsync(DashboardOptions options)
     {
+        // Console.WriteLine("DashboardCommand.ExecuteAsync started");
+        // Console.Out.Flush();
+        
         SolarDataService dataService = null!;
         
         await AnsiConsole.Status()
@@ -25,12 +28,20 @@ public class DashboardCommand
             });
 
         var data = await dataService.LoadDataAsync();
+        // Console.WriteLine($"Data loaded: {data?.Count ?? 0} years");
+        // Console.Out.Flush();
+        
         if (data == null)
         {
+            // Console.WriteLine("Data is null - showing error");
+            // Console.Out.Flush();
             AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
             return;
         }
 
+        // Console.WriteLine("About to clear console and display dashboard");
+        // Console.Out.Flush();
+        
         AnsiConsole.Clear();
         
         if (options.Animated)
