@@ -89,6 +89,6 @@ public class ExampleCommand : AsyncCommand<ExampleCommand.Settings>
 
 ## User Experience
 - Always provide feedback for user actions
-- Use emojis consistently: 🌞 ⚡ 📊 🏆 ⚠️ ❌
+- Use emojis consistently: 🌞 ⚡ 📊 🏆 ❗ ❌
 - Show helpful examples in command help text
 - Support both quick overview and detailed modes

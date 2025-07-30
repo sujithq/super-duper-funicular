@@ -15,7 +15,7 @@ Documentation in SolarScope CLI should be comprehensive, engaging, and education
 - Add blank lines around headings, lists, and code blocks for readability
 
 ### Visual Elements
-- Use appropriate emojis to enhance readability: 🌞 ⚡ 📊 🏆 ⚠️ 💡 🚀
+- Use appropriate emojis to enhance readability: 🌞 ⚡ 📊 🏆 ❗ 💡 🚀
 - Include badges for status, version, and build information
 - Add screenshots or ASCII art for visual examples
 - Use consistent formatting for commands, file names, and options
