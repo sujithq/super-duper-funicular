@@ -9,6 +9,155 @@
 **A beautiful, interactive command-line tool for monitoring and analyzing your solar energy system with weather correlations and anomaly detection.**
 
 > Built with ❤️ for GitHub's "For the Love of Code 2025" hackathon - Category 3: Terminal talent
+>
+## 🧑‍💻 Command Reference
+
+Below are examples of all available commands and their options. Each command supports the global options `--data|-d` (data file path/URL) and `--verbose|-v` (enable verbose output).
+
+### Dashboard Command
+
+Shows a real-time overview of your solar system.
+
+```bash
+solarscope dashboard [--animated|-a] [--full|-f] [--data|-d <file>] [--verbose|-v]
+```
+
+- `--animated, -a` : Show animated dashboard
+- `--full, -f` : Show full dashboard with all details
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope dashboard --animated --full
+solarscope dashboard -a -f -d ./data/sample.json --verbose
+```
+
+### Analyze Command
+
+Analyze production, weather, anomalies, or correlation data.
+
+```bash
+solarscope analyze [--type|-t <type>] [--count|-c <n>] [--data|-d <file>] [--verbose|-v]
+```
+
+- `--type, -t` : Type of analysis (`production`, `weather`, `anomalies`, `correlation`)
+- `--count, -c` : Number of days/records to analyze (default: 10)
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope analyze --type production --count 15
+solarscope analyze -t weather -c 20 -d ./data/sample.json
+```
+
+### Anomalies Command
+
+Detect and analyze system anomalies.
+
+```bash
+solarscope anomalies [--year|-y <year>] [--severity|-s <level>] [--interactive|-i] [--data|-d <file>] [--verbose|-v]
+```
+
+- `--year, -y` : Year to analyze (default: latest year in data)
+- `--severity, -s` : Minimum anomaly severity (`Low`, `Medium`, `High`)
+- `--interactive, -i` : Run in interactive mode
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope anomalies --year 2024 --severity High --interactive
+solarscope anomalies -y 2023 -s Medium -i -d ./data/sample.json
+```
+
+### Report Command
+
+Generate reports for different periods.
+
+```bash
+solarscope report [--period <period>] [--year <year>] [--start-day <n>] [--end-day <n>] [--data|-d <file>] [--verbose|-v]
+```
+
+- `--period` : Report period (`daily`, `weekly`, `monthly`, `yearly`)
+- `--year` : Year to report (optional)
+- `--start-day` : Start day for daily report (optional)
+- `--end-day` : End day for daily report (optional)
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope report --period monthly --year 2024
+solarscope report --period daily --start-day 100 --end-day 120 -d ./data/sample.json
+```
+
+### Weather Command
+
+Analyze weather and its correlation with solar production.
+
+```bash
+solarscope weather [--analysis <type>] [--year <year>] [--data|-d <file>] [--verbose|-v]
+```
+
+- `--analysis` : Analysis type (`overview`, `correlation`, `patterns`, `recommendations`)
+- `--year` : Year to analyze (optional)
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope weather --analysis correlation --year 2024
+solarscope weather --analysis patterns -d ./data/sample.json
+```
+
+### Explore Command
+
+Interactively explore your solar data.
+
+```bash
+solarscope explore [--mode <mode>] [--year <year>] [--data|-d <file>] [--verbose|-v]
+```
+
+- `--mode` : Exploration mode (`quick`, `guided`, `full`)
+- `--year` : Year to explore (optional)
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope explore --mode guided --year 2023
+solarscope explore --mode full -d ./data/sample.json
+```
+
+### Demo Command
+
+Showcase fun animated demos with different themes and speeds.
+
+```bash
+solarscope demo [--theme|-t <theme>] [--speed|-s <speed>] [--data|-d <file>] [--verbose|-v]
+```
+
+- `--theme, -t` : Demo theme (`solar`, `matrix`, `rainbow`)
+- `--speed, -s` : Animation speed (`slow`, `normal`, `fast`)
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope demo --theme matrix --speed fast
+solarscope demo -t rainbow -s slow -d ./data/sample.json
+```
+
+---
 
 ## ✨ Features
 
@@ -105,22 +254,37 @@ The tool analyzes your solar system data including:
 
 1. **Clone the repository**
 
-```bash
-git clone https://github.com/sujithq/super-duper-funicular.git
-cd super-duper-funicular
-```
+  ```bash
+  git clone https://github.com/sujithq/super-duper-funicular.git
+  cd super-duper-funicular
+  ```
 
 2. **Build the project**
 
-```bash
-cd src
-dotnet build
-```
+  ```bash
+  cd src
+  dotnet build
+  ```
 
 3. **Run the application**
 
+  ```bash
+  dotnet run -- dashboard
+  ```
+
+### Demo Generation (Optional)
+
+Want to generate the demo GIFs shown above? Install VHS and run our tape collection:
+
 ```bash
-dotnet run -- dashboard
+# Install VHS for demo generation
+go install github.com/charmbracelet/vhs@latest
+
+# Generate all demo GIFs
+./run-all-tapes.sh
+
+# Or generate specific demos
+cd tapes && vhs dashboard.tape
 ```
 
 ### Package Installation (Alternative)
@@ -201,25 +365,91 @@ solarscope demo --theme matrix --speed slow
 solarscope demo --theme rainbow --speed fast
 ```
 
-## 🎨 Visual Examples
+## � Live Demo GIFs
+
+Experience SolarScope CLI in action! We've created comprehensive demo recordings for every command and feature.
+
+### 🏠 Dashboard Demos
+
+| Command | Demo | Description |
+|---------|------|-------------|
+| `dashboard` | ![Dashboard](tapes/dashboard.gif) | Basic solar system overview |
+| `dashboard --animated` | ![Dashboard Animated](tapes/dashboard-animated.gif) | Animated dashboard experience |
+| `dashboard --full` | ![Dashboard Full](tapes/dashboard-full.gif) | Complete dashboard with all details |
+| `dashboard --animated --full` | ![Dashboard Full Animated](tapes/dashboard-animated-full.gif) | Ultimate animated experience |
+
+### 📊 Analysis Demos
+
+| Command | Demo | Description |
+|---------|------|-------------|
+| `analyze --type production` | ![Analyze Production](tapes/analyze-production.gif) | Production pattern analysis |
+| `analyze --type weather` | ![Analyze Weather](tapes/analyze-weather.gif) | Weather correlation analysis |
+| `analyze --type anomalies` | ![Analyze Anomalies](tapes/analyze-anomalies.gif) | Anomaly detection analysis |
+| `analyze --type correlation` | ![Analyze Correlation](tapes/analyze-correlation.gif) | Multi-metric correlation |
+
+### ⚠️ Anomaly Detection Demos
+
+| Command | Demo | Description |
+|---------|------|-------------|
+| `anomalies --interactive` | ![Anomalies Interactive](tapes/anomalies-interactive.gif) | Interactive anomaly exploration |
+| `anomalies --severity High` | ![Anomalies High](tapes/anomalies-high.gif) | High severity anomalies only |
+| `anomalies --year 2025` | ![Anomalies 2025](tapes/anomalies-2025.gif) | Current year anomaly analysis |
+
+### 🎮 Theme Showcase Demos
+
+| Theme | Demo | Description |
+|-------|------|-------------|
+| Solar (Default) | ![Demo Solar](tapes/demo-solar-normal.gif) | Classic solar system theme |
+| Matrix | ![Demo Matrix](tapes/demo-matrix-normal.gif) | Cyberpunk digital rain theme |
+| Rainbow | ![Demo Rainbow](tapes/demo-rainbow-normal.gif) | Colorful celebration theme |
+
+### 📋 Reporting & Weather Demos
+
+| Command | Demo | Description |
+|---------|------|-------------|
+| `report --period monthly` | ![Report Monthly](tapes/report-monthly.gif) | Monthly performance reports |
+| `weather --analysis correlation` | ![Weather Correlation](tapes/weather-correlation.gif) | Weather impact analysis |
+| `explore --mode guided` | ![Explore Guided](tapes/explore-guided.gif) | Interactive data exploration |
+
+### 🎬 Generate Your Own Demos
+
+Want to create these GIFs yourself? Use our VHS tape collection:
+
+```bash
+# Install VHS (if not already installed)
+go install github.com/charmbracelet/vhs@latest
+
+# Generate all demo GIFs at once
+./run-all-tapes.sh
+
+# Or generate specific demos
+cd tapes
+vhs dashboard.tape          # Basic dashboard
+vhs demo-matrix-fast.tape   # Fast matrix theme
+vhs weather-correlation-2025.tape  # Current year weather analysis
+```
+
+**📦 Complete Collection**: We have **58+ demo recordings** covering every command, option, theme, and year variant!
+
+## �🎨 Visual Examples
 
 ### Dashboard Overview
 
-```
+```text
 🌞 Solar System Dashboard 🌞
-┌─────────────────────────────────────────┐
+┌───────────────────────────────────────────────┐
 │ ⚡ Total Production: 2,847.5 kWh     ✅ │
-│ 🏠 Total Consumption: 2,156.8 kWh   ✅ │  
-│ 🔌 Grid Injection: 690.7 kWh        ✅ │
-│ 📊 Average Daily: 12.8 kWh          ✅ │
-│ 🏆 Best Day: Day 156 (28.4 kWh)     🏆 │
-│ ❗ System Anomalies: 3 detected     ❗ │
-└─────────────────────────────────────────┘
+│ 🏠 Total Consumption: 2,156.8 kWh    ✅ │  
+│ 🔌 Grid Injection: 690.7 kWh         ✅ │
+│ 📊 Average Daily: 12.8 kWh           ✅ │
+│ 🏆 Best Day: Day 156 (28.4 kWh)      🏆 │
+│ ❗ System Anomalies: 3 detected      ❗ │
+└───────────────────────────────────────────────┘
 ```
 
 ### Production Analysis Chart
 
-```
+```text
 Daily Production (Last 20 Days)
 ▅▆▇██▆▅▇▆▅▆▇██▆▅▇▆▅▆▇
 Day 344  Day 348  Day 352  Day 356  Day 360
@@ -227,14 +457,14 @@ Day 344  Day 348  Day 352  Day 356  Day 360
 
 ### Anomaly Detection
 
-```
+```text
 ❗ Anomaly Detection Results
-┌─────────────────────────────────────┐
+┌────────────────────────────────────────┐
 │ High Severity:    2 occurrences    │
 │ Medium Severity:  5 occurrences    │  
 │ Low Severity:     8 occurrences    │
 │ Total Anomalies:  15 detected      │
-└─────────────────────────────────────┘
+└────────────────────────────────────────┘
 ```
 
 ## 🔧 Configuration
