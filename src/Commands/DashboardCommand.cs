@@ -1,57 +1,69 @@
 using Spectre.Console;
+using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using System.ComponentModel;
 
 namespace SolarScope.Commands;
 
 /// <summary>
-/// Dashboard command implementation
+/// Dashboard command implementation (Spectre.Console.Cli)
 /// </summary>
-public class DashboardCommand
+public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
 {
-    public async Task ExecuteAsync(DashboardOptions options)
+    public class Settings : BaseCommandSettings
     {
-        // Console.WriteLine("DashboardCommand.ExecuteAsync started");
-        // Console.Out.Flush();
-        
+        [CommandOption("--animated|-a")]
+        [Description("Show animated dashboard")]
+        [DefaultValue(false)]
+        public bool Animated { get; set; }
+
+        [CommandOption("--full|-f")]
+        [Description("Show full dashboard with all details")]
+        [DefaultValue(false)]
+        public bool FullDashboard { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
         SolarDataService dataService = null!;
-        
+
         await AnsiConsole.Status()
             .Spinner(Spinner.Known.Star)
             .SpinnerStyle(Style.Parse("yellow"))
             .StartAsync("Loading solar data...", async ctx =>
             {
-                dataService = new SolarDataService(options.DataFile);
-                
+                dataService = new SolarDataService(settings.DataFile);
                 ctx.Status("Analyzing data...");
                 await Task.Delay(500); // Simulated processing for dramatic effect
             });
 
         var data = await dataService.LoadDataAsync();
-        // Console.WriteLine($"Data loaded: {data?.Count ?? 0} years");
-        // Console.Out.Flush();
-        
+
         if (data == null)
         {
-            // Console.WriteLine("Data is null - showing error");
-            // Console.Out.Flush();
             AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
-            return;
+            return 1;
         }
 
-        // Console.WriteLine("About to clear console and display dashboard");
-        // Console.Out.Flush();
-        
         AnsiConsole.Clear();
-        
-        if (options.Animated)
+
+        if (settings.Verbose)
         {
-            await DisplayAnimatedDashboard(data, options.FullDashboard);
+            AnsiConsole.MarkupLine("[dim]Verbose mode enabled[/]");
+            AnsiConsole.MarkupLine($"[dim]Data file: {settings.DataFile}[/]");
+            AnsiConsole.WriteLine();
+        }
+
+        if (settings.Animated)
+        {
+            await DisplayAnimatedDashboard(data, settings.FullDashboard);
         }
         else
         {
-            DisplayStaticDashboard(data, options.FullDashboard);
+            DisplayStaticDashboard(data, settings.FullDashboard);
         }
+        return 0;
     }
 
     private void DisplayStaticDashboard(SolarData data, bool fullDashboard)
