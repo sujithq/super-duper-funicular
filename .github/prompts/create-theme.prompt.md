@@ -3,9 +3,9 @@ mode: agent
 description: Create a new animated theme for demo command
 ---
 
-# Create Demo Theme
+# Create Demo Theme (Spectre.Console.Cli)
 
-Create a new animated theme for the SolarScope CLI demo command with beautiful terminal animations and effects.
+Create a new animated theme for the SolarScope CLI demo command, following Spectre.Console.Cli command structure and project UI/UX standards for beautiful terminal animations and effects.
 
 ## Step 1: Define Theme Concept
 
@@ -23,17 +23,19 @@ If not already provided, ask the user:
 4. Plan color transitions and effects
 5. Consider the educational/inspirational message
 
-## Step 3: Implement Theme Method
+## Step 3: Implement Theme in CLI Command
 
-1. Add new theme method to `DemoCommand.cs`
-2. Follow the established async pattern with cancellation support
-3. Use appropriate Spectre.Console widgets:
+1. Add or extend a theme method in `DemoCommand.cs` (in `src/Commands/`)
+2. Ensure the command inherits from `AsyncCommand<TSettings>` and uses a nested `Settings` class for options (e.g., theme selection, speed)
+3. Use async/await and support cancellation with `CancellationToken`
+4. Use Spectre.Console widgets:
    - `FigletText` for large text
    - `Panel` for framed content
    - `Rule` for separators
    - Custom animations with `AnsiConsole.Live`
+5. Integrate the theme as a selectable option via `[CommandOption]` in the CLI
 
-## Step 4: Animation Techniques
+## Step 4: Animation Techniques & UI/UX
 
 ### Text Effects
 - Typewriter effects with character-by-character reveal
@@ -53,12 +55,18 @@ If not already provided, ask the user:
 - Support cancellation with CancellationToken
 - Smooth transitions between scenes
 
-## Step 5: Theme Integration
+### UI/UX Standards
+- Use project color schemes (green, blue, yellow, red)
+- Include emojis for visual appeal
+- Ensure high contrast and accessibility
+- Provide joyful, educational, and engaging experiences
 
-1. Add theme option to command-line parser
-2. Update help text with new theme description
-3. Ensure theme follows project color schemes
-4. Test theme at different terminal sizes
+## Step 5: Theme Integration & Testing
+
+1. Register the theme option in the CLI command using Spectre.Console.Cli
+2. Update help text and documentation with the new theme description
+3. Test the theme at different terminal sizes and speeds
+4. Validate output formatting, accessibility, and performance
 
 ## Example Theme Structure
 
@@ -66,13 +74,10 @@ If not already provided, ask the user:
 private async Task DisplayCustomThemeDemo(AnimationSpeed speed, CancellationToken cancellationToken)
 {
     var delay = GetDelayForSpeed(speed);
-    
     // Scene 1: Introduction
     await ShowIntroAnimation(delay, cancellationToken);
-    
     // Scene 2: Main visual
     await ShowMainAnimation(delay, cancellationToken);
-    
     // Scene 3: Conclusion
     await ShowOutroAnimation(delay, cancellationToken);
 }
@@ -85,4 +90,4 @@ private async Task DisplayCustomThemeDemo(AnimationSpeed speed, CancellationToke
 - **Seasonal Theme**: Year cycle showing seasonal production patterns
 - **Ocean Theme**: Waves of clean energy flowing across the screen
 
-Consider the educational value and how the theme reinforces the renewable energy message of SolarScope CLI.
+Consider the educational value and how the theme reinforces the renewable energy message of SolarScope CLI. Ensure all new themes are discoverable via CLI help and follow the project's joyful, accessible design principles.

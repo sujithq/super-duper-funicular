@@ -22,7 +22,7 @@ Transform boring solar data into an engaging, insightful, and joyful terminal ex
 - [x] **Project Structure** - Clean .NET 9.0 console application
 - [x] **Data Models** - Rich record types with calculated properties
 - [x] **Services Layer** - Data processing, analytics, and correlation engine
-- [x] **CLI Framework** - CommandLineParser integration with beautiful help
+- [x] **CLI Framework** - Spectre.Console.Cli integration with beautiful help and modern command structure
 - [x] **Dashboard Command** - Interactive charts, animations, and real-time stats
 - [x] **Analysis Commands** - Production, weather, anomaly, and correlation analysis
 - [x] **Demo Commands** - Multiple themes (Solar, Matrix, Rainbow) with animations
@@ -82,7 +82,7 @@ Transform boring solar data into an engaging, insightful, and joyful terminal ex
 - **.NET 9.0** - Modern, cross-platform framework
 - **C# 13** - Latest language features with records and pattern matching
 - **Spectre.Console 0.49.1** - Beautiful terminal UI with charts and animations
-- **CommandLineParser 2.9.1** - Robust command-line argument parsing
+- **Spectre.Console.Cli 2.x** - Modern command-line argument parsing and command structure
 - **System.Text.Json 9.0.7** - High-performance JSON processing
 
 ### Project Structure
@@ -104,7 +104,7 @@ src/
 ```
 
 ### Key Design Patterns
-- **Command Pattern** - Separate command classes for each feature
+- **Command Pattern (Spectre.Console.Cli)** - Each command inherits from `AsyncCommand<TSettings>` and uses a nested `Settings : BaseCommandSettings` class with `[CommandOption]` attributes for arguments
 - **Service Layer** - Business logic separated from presentation
 - **Record Types** - Immutable data models with computed properties
 - **Async/Await** - Non-blocking operations with progress indication

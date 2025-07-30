@@ -3,9 +3,9 @@ mode: agent
 description: Add analytics features to SolarDataService
 ---
 
-# Add Analytics Feature
+# Add Analytics Feature to CLI
 
-Add a new analytics feature to the SolarDataService following established patterns and solar domain expertise.
+Add a new analytics feature to the SolarScope CLI, following Spectre.Console.Cli patterns, solar domain expertise, and project UI/UX standards.
 
 ## Step 1: Define Analytics Requirements
 
@@ -17,31 +17,32 @@ If not already provided, ask the user:
 
 ## Step 2: Design Data Models
 
-1. Create or extend data models in `src/Models/models.cs`
-2. Use C# records for immutable result types
-3. Include calculated properties for derived metrics
-4. Add appropriate JSON serialization attributes if needed
+1. Create or extend data models in `src/Models/models.cs` using C# records
+2. Include calculated properties for derived metrics
+3. Add appropriate JSON serialization attributes if needed
+4. Implement data validation as required
 
-## Step 3: Implement Analytics Method
+## Step 3: Implement Analytics Logic in Service Layer
 
-1. Add the new method to `SolarDataService`
-2. Use async/await patterns for data processing
+1. Add or extend analytics methods in `SolarDataService`
+2. Use async/await for data processing
 3. Include proper error handling and validation
-4. Implement efficient LINQ queries for data analysis
-5. Add statistical calculations (mean, median, correlations)
+4. Implement efficient LINQ/statistical calculations (mean, median, correlations)
 
-## Step 4: Create Visualization Support
+## Step 4: Integrate with CLI Command (Spectre.Console.Cli)
 
-1. Design appropriate Spectre.Console charts or tables
-2. Use consistent color schemes and formatting
-3. Include meaningful headers and summaries
-4. Add progress indicators for complex calculations
+1. Create or extend a command in `src/Commands/` using Spectre.Console.Cli
+2. Inherit from `AsyncCommand<TSettings>` and define a nested `Settings : BaseCommandSettings` class
+3. Use `[CommandOption]` attributes for CLI arguments
+4. Call the analytics method from the command's `ExecuteAsync` method
+5. Use Spectre.Console for output: charts, tables, color schemes, emojis, and progress indicators
+6. Follow project color conventions (green, blue, yellow, red) and joyful UI/UX
 
-## Step 5: Integration and Testing
+## Step 5: Testing and Validation
 
-1. Add command support or extend existing commands
-2. Test with realistic solar data scenarios
-3. Validate calculations with edge cases
+1. Add or update unit tests in `src/Tests/` for analytics logic and CLI command
+2. Test with realistic and edge-case solar data
+3. Validate CLI output formatting and error handling
 4. Ensure performance is acceptable for large datasets
 
 ## Analytics Categories to Consider
@@ -52,4 +53,4 @@ If not already provided, ask the user:
 - **Efficiency Metrics**: Energy balance, grid injection patterns
 - **Comparative Analysis**: Day-to-day, month-to-month comparisons
 
-Reference existing analytics methods in `SolarDataService` for patterns and calculation approaches.
+Reference existing analytics commands and methods for patterns and calculation approaches. Ensure all new features are discoverable via CLI help and follow the SolarScope CLI's joyful, educational, and accessible design principles.
