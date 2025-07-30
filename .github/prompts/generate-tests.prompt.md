@@ -3,22 +3,22 @@ mode: agent
 description: Create comprehensive unit tests for SolarScope CLI components
 ---
 
-# Generate Unit Tests
+# Generate Unit Tests (Spectre.Console.Cli)
 
-Create comprehensive unit tests for SolarScope CLI components using xUnit framework and following established testing patterns.
+Create comprehensive unit tests for SolarScope CLI components using xUnit, following current testing patterns and ensuring coverage for Spectre.Console.Cli command structure and service logic.
 
 ## Step 1: Identify Test Scope
 
 If not already specified, determine:
-- Which classes/methods need testing?
+- Which classes/methods or CLI commands need testing?
 - What are the critical business logic paths?
 - What edge cases should be covered?
 - Are there any external dependencies to mock?
 
 ## Step 2: Create Test Class Structure
 
-1. Create test file in `src/Tests/` directory
-2. Follow naming convention: `[ClassName]Tests.cs`
+1. Create test files in `src/Tests/` directory
+2. Follow naming convention: `[ClassName]Tests.cs` or `[CommandName]CommandTests.cs`
 3. Use descriptive test class and method names
 4. Organize tests with nested classes if needed
 
@@ -36,11 +36,12 @@ If not already specified, determine:
 - Test error scenarios and exception handling
 - Verify data processing and analytics calculations
 
-### For Commands:
-- Test command-line argument parsing
-- Mock service dependencies
-- Test error handling and exit codes
+### For CLI Commands (Spectre.Console.Cli):
+- Test command-line argument parsing using `[CommandOption]` attributes
+- Mock service dependencies injected into commands
+- Test error handling, exit codes, and validation logic
 - Verify output formatting (separate from UI testing)
+- Ensure commands inherit from `AsyncCommand<TSettings>` and use nested `Settings` classes
 
 ## Step 4: Create Sample Test Data
 
@@ -58,10 +59,8 @@ public void EnergyEfficiency_WithValidData_CalculatesCorrectly()
 {
     // Arrange
     var dayData = new DayData { Production = 20.0, Consumption = 15.0 };
-    
     // Act
     var efficiency = dayData.EnergyEfficiency;
-    
     // Assert
     Assert.Equal(75.0, efficiency);
 }
@@ -78,9 +77,9 @@ public void EnergyEfficiency_VariousInputs_ReturnsExpected(
 ```
 
 ### Integration Tests
-- Test service interactions
+- Test service and CLI command interactions
 - Use real data files for validation
-- Test command execution end-to-end
+- Test command execution end-to-end (simulate CLI input)
 
 ## Step 6: Performance and Property Tests
 
@@ -89,4 +88,4 @@ public void EnergyEfficiency_VariousInputs_ReturnsExpected(
 3. Test memory usage and disposal patterns
 4. Verify async operation behavior
 
-Reference existing test files and follow the testing guidelines in the instructions.
+Reference existing test files and follow the testing guidelines in the instructions. Ensure all new tests cover both service and CLI command logic, and validate CLI integration for Spectre.Console.Cli-based commands.

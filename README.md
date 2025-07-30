@@ -3,6 +3,7 @@
 [![For the Love of Code 2025](https://img.shields.io/badge/For%20the%20Love%20of%20Code-2025-orange?style=flat-square)](https://github.blog/open-source/for-the-love-of-code-2025/)
 [![.NET 9.0](https://img.shields.io/badge/.NET-9.0-purple?style=flat-square)](https://dotnet.microsoft.com/download/dotnet/9.0)
 [![Spectre.Console](https://img.shields.io/badge/Spectre.Console-0.49.1-blue?style=flat-square)](https://spectreconsole.net/)
+[![Spectre.Console.Cli](https://img.shields.io/badge/Spectre.Console.Cli-2.x-blue?style=flat-square)](https://spectreconsole.net/cli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
 **A beautiful, interactive command-line tool for monitoring and analyzing your solar energy system with weather correlations and anomaly detection.**
@@ -12,6 +13,7 @@
 ## ✨ Features
 
 ### 🎯 Core Functionality
+
 - **Interactive Dashboard** - Real-time solar system overview with beautiful charts
 - **Advanced Analytics** - Production analysis, weather correlation, and trend detection  
 - **Anomaly Detection** - Intelligent system monitoring with severity classification
@@ -19,6 +21,7 @@
 - **Comprehensive Reports** - Monthly, yearly, and custom reporting
 
 ### 🎨 Visual Excellence
+
 - **Beautiful Charts** - Bar charts, breakdown charts, and data visualizations
 - **Animated Displays** - Dynamic loading, real-time updates, and smooth transitions
 - **Multiple Themes** - Solar, Matrix, and Rainbow themes for the demo mode
@@ -26,6 +29,7 @@
 - **Responsive Design** - Adapts to your terminal size and capabilities
 
 ### 🚀 Interactive Experience
+
 - **Command-line Interface** - Intuitive commands with comprehensive help
 - **Progress Indicators** - Visual feedback for all operations
 - **Status Updates** - Real-time processing information
@@ -35,18 +39,22 @@
 ## 🏗️ Architecture
 
 ### Data Models
+
 - **Rich Data Types** - Comprehensive models for solar, weather, and anomaly data
 - **Type Safety** - Full C# record types with JSON serialization
 - **Calculated Properties** - Automatic efficiency, balance, and trend calculations
 - **Enum Classifications** - Weather conditions, anomaly severity, and wind classifications
 
 ### Services Layer
+
 - **Data Service** - Efficient JSON parsing and data access
 - **Analytics Engine** - Statistical analysis and correlation calculations
 - **Anomaly Detection** - Smart pattern recognition and severity assessment
 - **Report Generation** - Flexible reporting with multiple output formats
 
 ### Command Architecture
+
+- **Spectre.Console.Cli Pattern** - Each command inherits from `AsyncCommand<TSettings>` and uses a nested `Settings : BaseCommandSettings` class with `[CommandOption]` attributes for arguments
 - **Modular Commands** - Separate command classes for each feature
 - **Shared Options** - Common base options with command-specific extensions
 - **Async Processing** - Non-blocking operations with progress indication
@@ -55,18 +63,21 @@
 ## 🎮 Demo Modes
 
 ### Solar Theme (Default)
+
 - Animated solar system ASCII art
 - Energy flow visualizations
 - Weather effect simulations
 - Production timeline animations
 
 ### Matrix Theme
+
 - Digital rain intro sequence
 - Green terminal aesthetics
 - Glitch effects and system messages
 - Cyberpunk data visualization
 
 ### Rainbow Theme
+
 - Colorful data presentations
 - Animated rainbow effects
 - Vibrant charts and indicators
@@ -85,6 +96,7 @@ The tool analyzes your solar system data including:
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
+
 - .NET 9.0 SDK or later
 - Windows, macOS, or Linux
 - Terminal with Unicode support (recommended)
@@ -92,23 +104,27 @@ The tool analyzes your solar system data including:
 ### Quick Start
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/sujithq/super-duper-funicular.git
 cd super-duper-funicular
 ```
 
 2. **Build the project**
+
 ```bash
 cd src
 dotnet build
 ```
 
 3. **Run the application**
+
 ```bash
 dotnet run -- dashboard
 ```
 
 ### Package Installation (Alternative)
+
 ```bash
 dotnet pack
 dotnet tool install --global --add-source ./nupkg SolarScope
@@ -118,6 +134,7 @@ solarscope dashboard
 ## 🎯 Usage Examples
 
 ### Dashboard Commands
+
 ```bash
 # Quick dashboard overview
 solarscope dashboard
@@ -130,6 +147,7 @@ solarscope dashboard --animated --full
 ```
 
 ### Analysis Commands
+
 ```bash
 # Analyze production patterns
 solarscope analyze --type production --count 15
@@ -145,6 +163,7 @@ solarscope analyze --type weather --start-day 100 --end-day 200
 ```
 
 ### Reporting Commands
+
 ```bash
 # Generate monthly report
 solarscope report --type monthly
@@ -157,6 +176,7 @@ solarscope report --type monthly --output monthly_report.json --format json
 ```
 
 ### Specialized Commands
+
 ```bash
 # Detect system anomalies
 solarscope anomalies --severity medium --interactive
@@ -169,6 +189,7 @@ solarscope explore --mode guided
 ```
 
 ### Fun Demo Commands
+
 ```bash
 # Solar-themed demo
 solarscope demo --theme solar --speed normal
@@ -183,6 +204,7 @@ solarscope demo --theme rainbow --speed fast
 ## 🎨 Visual Examples
 
 ### Dashboard Overview
+
 ```
 🌞 Solar System Dashboard 🌞
 ┌─────────────────────────────────────────┐
@@ -196,6 +218,7 @@ solarscope demo --theme rainbow --speed fast
 ```
 
 ### Production Analysis Chart
+
 ```
 Daily Production (Last 20 Days)
 ▅▆▇██▆▅▇▆▅▆▇██▆▅▇▆▅▆▇
@@ -203,6 +226,7 @@ Day 344  Day 348  Day 352  Day 356  Day 360
 ```
 
 ### Anomaly Detection
+
 ```
 ⚠️ Anomaly Detection Results
 ┌─────────────────────────────────────┐
@@ -216,7 +240,9 @@ Day 344  Day 348  Day 352  Day 356  Day 360
 ## 🔧 Configuration
 
 ### Data Sources
+
 The tool expects JSON data in the following format:
+
 ```json
 {
   "2023": [
@@ -235,6 +261,7 @@ The tool expects JSON data in the following format:
 ```
 
 ### Custom Data Files
+
 ```bash
 # Use custom data file
 solarscope dashboard --data /path/to/your/solar-data.json
@@ -248,6 +275,7 @@ solarscope analyze --verbose --type production
 This project was created for the GitHub "For the Love of Code 2025" hackathon. Contributions are welcome!
 
 ### Development Setup
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -255,6 +283,7 @@ This project was created for the GitHub "For the Love of Code 2025" hackathon. C
 5. Submit a pull request
 
 ### Code Style
+
 - Follow C# coding conventions
 - Use meaningful variable names
 - Add XML documentation for public APIs
@@ -267,17 +296,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 ### Technologies Used
+
 - **[.NET 9.0](https://dotnet.microsoft.com/)** - Modern, cross-platform framework
 - **[Spectre.Console](https://spectreconsole.net/)** - Beautiful console applications
-- **[CommandLineParser](https://github.com/commandlineparser/commandline)** - Command-line argument parsing
+- **[Spectre.Console.Cli](https://spectreconsole.net/cli/)** - Modern command-line argument parsing and command structure
 - **[System.Text.Json](https://docs.microsoft.com/en-us/dotnet/api/system.text.json)** - High-performance JSON processing
 
 ### Inspiration
+
 - **[Rich (Python)](https://github.com/willmcgugan/rich)** - Inspiration for terminal formatting
 - **[GitHub CLI](https://cli.github.com/)** - Command structure and user experience
 - **Solar Energy Community** - For the importance of renewable energy monitoring
 
 ### Hackathon
+
 Created with ❤️ for **[GitHub's "For the Love of Code 2025"](https://github.blog/open-source/for-the-love-of-code-2025/)** hackathon.
 
 **Category:** Terminal talent  
@@ -286,6 +318,7 @@ Created with ❤️ for **[GitHub's "For the Love of Code 2025"](https://github.
 ## � Project Status
 
 The project maintains a comprehensive `PROJECT_SUMMARY.md` file that tracks:
+
 - Complete implementation status and progress
 - Technical architecture and design decisions
 - Feature documentation and usage examples
@@ -294,6 +327,7 @@ The project maintains a comprehensive `PROJECT_SUMMARY.md` file that tracks:
 - Future roadmap and enhancement plans
 
 To keep the summary updated, run:
+
 ```bash
 # Linux/macOS
 ./update-summary.sh
