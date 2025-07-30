@@ -147,29 +147,61 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     }
 
     private async Task TypewriterEffect(string text, int speed, bool newLine = true)
+{
+    // Check if the text contains markup tags
+    bool hasMarkup = text.Contains('[') && text.Contains(']') && text.Contains("[/]");
+    
+    if (hasMarkup)
     {
-        foreach (var word in text.Split(' '))
-    {
-        // If the word is all letters/numbers, type it char by char
-        if (word.All(char.IsLetterOrDigit))
+        // For markup text, we need to handle it differently
+        // Extract the content between tags and apply formatting
+        var markupRegex = new System.Text.RegularExpressions.Regex(@"\[([^\]]+)\](.*?)\[/\]");
+        var match = markupRegex.Match(text);
+        
+        if (match.Success)
         {
-            foreach (char c in word)
+            var colorTag = match.Groups[1].Value;
+            var content = match.Groups[2].Value;
+            
+            // Type each character with the color applied
+            foreach (char c in content)
             {
-                AnsiConsole.Markup(Markup.Escape(c.ToString()));
+                AnsiConsole.Markup($"[{colorTag}]{Markup.Escape(c.ToString())}[/]");
                 await Task.Delay(speed / 2);
             }
-            AnsiConsole.Markup(" ");
         }
         else
         {
-            // For emoji or non-word, print as a whole
-            AnsiConsole.Markup(Markup.Escape(word) + " ");
-            await Task.Delay(speed);
+            // Fallback: display the whole markup text at once
+            AnsiConsole.Markup(text);
         }
     }
-
-        if (newLine) AnsiConsole.WriteLine();
+    else
+    {
+        // Handle plain text word by word
+        foreach (var word in text.Split(' '))
+        {
+            // If the word is all letters/numbers, type it char by char
+            if (word.All(char.IsLetterOrDigit))
+            {
+                foreach (char c in word)
+                {
+                    AnsiConsole.Markup(Markup.Escape(c.ToString()));
+                    await Task.Delay(speed / 2);
+                }
+                AnsiConsole.Markup(" ");
+            }
+            else
+            {
+                // For emoji or non-word, print as a whole
+                AnsiConsole.Markup(Markup.Escape(word) + " ");
+                await Task.Delay(speed);
+            }
+        }
     }
+    
+    if (newLine) AnsiConsole.WriteLine();
+}
 
     private async Task SimulateDataLoading(SolarData data, int speed)
     {
