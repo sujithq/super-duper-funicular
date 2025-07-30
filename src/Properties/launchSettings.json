@@ -2,7 +2,7 @@
   "profiles": {
     "SolarScope": {
       "commandName": "Project",
-      "commandLineArgs": "analyze"
+      "commandLineArgs": "demo -t rainbow"
     },
     "SolarScope Dashboard Animated": {
       "commandName": "Project",

@@ -1,8 +1,9 @@
-using Spectre.Console;
-using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using Spectre.Console;
+using Spectre.Console.Cli;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace SolarScope.Commands;
 
@@ -146,62 +147,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         AnsiConsole.Clear();
     }
 
-    private async Task TypewriterEffect(string text, int speed, bool newLine = true)
-{
-    // Check if the text contains markup tags
-    bool hasMarkup = text.Contains('[') && text.Contains(']') && text.Contains("[/]");
     
-    if (hasMarkup)
-    {
-        // For markup text, we need to handle it differently
-        // Extract the content between tags and apply formatting
-        var markupRegex = new System.Text.RegularExpressions.Regex(@"\[([^\]]+)\](.*?)\[/\]");
-        var match = markupRegex.Match(text);
-        
-        if (match.Success)
-        {
-            var colorTag = match.Groups[1].Value;
-            var content = match.Groups[2].Value;
-            
-            // Type each character with the color applied
-            foreach (char c in content)
-            {
-                AnsiConsole.Markup($"[{colorTag}]{Markup.Escape(c.ToString())}[/]");
-                await Task.Delay(speed / 2);
-            }
-        }
-        else
-        {
-            // Fallback: display the whole markup text at once
-            AnsiConsole.Markup(text);
-        }
-    }
-    else
-    {
-        // Handle plain text word by word
-        foreach (var word in text.Split(' '))
-        {
-            // If the word is all letters/numbers, type it char by char
-            if (word.All(char.IsLetterOrDigit))
-            {
-                foreach (char c in word)
-                {
-                    AnsiConsole.Markup(Markup.Escape(c.ToString()));
-                    await Task.Delay(speed / 2);
-                }
-                AnsiConsole.Markup(" ");
-            }
-            else
-            {
-                // For emoji or non-word, print as a whole
-                AnsiConsole.Markup(Markup.Escape(word) + " ");
-                await Task.Delay(speed);
-            }
-        }
-    }
-    
-    if (newLine) AnsiConsole.WriteLine();
-}
 
     private async Task SimulateDataLoading(SolarData data, int speed)
     {
@@ -402,6 +348,111 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         }
     }
 
+    private async Task TypewriterEffect(string text, int speed, bool newLine = true)
+    {
+        // Check if the text contains markup tags
+        bool hasMarkup = text.Contains('[') && text.Contains(']') && text.Contains("[/]");
+
+        if (hasMarkup)
+        {
+            // For markup text, we need to handle it differently
+            // Extract the content between tags and apply formatting
+            var markupRegex = new System.Text.RegularExpressions.Regex(@"\[([^\]]+)\](.*?)\[/\]");
+            var match = markupRegex.Match(text);
+
+            if (match.Success)
+            {
+                var colorTag = match.Groups[1].Value;
+                var content = match.Groups[2].Value;
+
+                // Iterate over Unicode text elements (grapheme clusters)
+                var enumerator = StringInfo.GetTextElementEnumerator(content);
+                while (enumerator.MoveNext())
+                {
+                    string element = enumerator.GetTextElement();
+                    if (IsEmoji(element))
+                    {
+                        // Display emoji as-is without color
+                        AnsiConsole.Markup(element);
+                    }
+                    else
+                    {
+                        // Regular character - escape and apply color
+                        AnsiConsole.Markup($"[{colorTag}]{Markup.Escape(element)}[/]");
+                    }
+                    await Task.Delay(speed / 2);
+                }
+            }
+            else
+            {
+                // Fallback: display the whole markup text at once
+                AnsiConsole.Markup(text);
+            }
+        }
+        else
+        {
+            // Handle plain text word by word
+            foreach (var word in text.Split(' '))
+            {
+                // If the word is all letters/numbers, type it element by element
+                if (word.All(char.IsLetterOrDigit))
+                {
+                    var enumerator = StringInfo.GetTextElementEnumerator(word);
+                    while (enumerator.MoveNext())
+                    {
+                        string element = enumerator.GetTextElement();
+                        AnsiConsole.Markup(Markup.Escape(element));
+                        await Task.Delay(speed / 2);
+                    }
+                    AnsiConsole.Markup(" ");
+                }
+                else
+                {
+                    // For emoji or non-word, check each text element
+                    var enumerator = StringInfo.GetTextElementEnumerator(word);
+                    while (enumerator.MoveNext())
+                    {
+                        string element = enumerator.GetTextElement();
+                        if (IsEmoji(element))
+                        {
+                            AnsiConsole.Markup(element);
+                        }
+                        else
+                        {
+                            AnsiConsole.Markup(Markup.Escape(element));
+                        }
+                        await Task.Delay(speed / 4);
+                    }
+                    AnsiConsole.Markup(" ");
+                    await Task.Delay(speed);
+                }
+            }
+        }
+
+        if (newLine) AnsiConsole.WriteLine();
+    }
+    /// <summary>
+    /// Helper method to detect if a character is an emoji or special Unicode symbol
+    /// </summary>
+    /// <param name="c">Character to check</param>
+    /// <returns>True if the character is an emoji or special symbol</returns>
+    private static bool IsEmoji(string element)
+    {
+        if (element.Length == 1)
+        {
+            char c = element[0];
+            return char.IsSymbol(c) ||
+                   char.IsSurrogate(c) ||
+                   (c >= 0x1F000 && c <= 0x1F9FF) ||
+                   (c >= 0x2600 && c <= 0x26FF) ||
+                   (c >= 0x2700 && c <= 0x27BF);
+        }
+        // Most emojis are surrogate pairs or multi-char
+        // If not a single char, treat as emoji
+        return true;
+    }
+
+
     private async Task MatrixGlitchEffect(int speed)
     {
         AnsiConsole.WriteLine();
@@ -422,28 +473,47 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     }
 
     private async Task RainbowIntro(int speed)
+{
+    var colors = new[] { "red", "orange1", "yellow", "green", "blue", "purple", "magenta" };
+    var text = "🌈 RAINBOW SOLAR SPECTACULAR 🌈";
+    
+    for (int i = 0; i < 10; i++)
     {
-        var colors = new[] { "red", "orange1", "yellow", "green", "blue", "purple", "magenta" };
-        var text = "🌈 RAINBOW SOLAR SPECTACULAR 🌈";
+        AnsiConsole.Clear();
+        var coloredText = "";
         
-        for (int i = 0; i < 10; i++)
+        for (int j = 0; j < text.Length; j++)
         {
-            AnsiConsole.Clear();
-            var coloredText = "";
+            var character = text[j];
             
-            for (int j = 0; j < text.Length; j++)
+            // Check if character is an emoji or special Unicode character
+            if (char.IsSymbol(character) || char.IsSurrogate(character) ||
+                (character >= 0x1F000 && character <= 0x1F9FF)
+                )
             {
-                var colorIndex = (i + j) % colors.Length;
-                coloredText += $"[{colors[colorIndex]}]{text[j]}[/]";
+                // Display emoji as-is without color markup
+                coloredText += Markup.Escape(character.ToString());
             }
-            
-            AnsiConsole.Write(Align.Center(new Markup(coloredText)));
-            await Task.Delay(speed * 2);
+            else if (character == ' ')
+            {
+                // Preserve spaces
+                coloredText += " ";
+            }
+            else
+            {
+                // Apply rainbow color to regular characters
+                var colorIndex = (i + j) % colors.Length;
+                coloredText += $"[{colors[colorIndex]}]{Markup.Escape(character.ToString())}[/]";
+            }
         }
         
-        AnsiConsole.WriteLine();
-        AnsiConsole.WriteLine();
+        AnsiConsole.Write(Align.Center(new Markup(coloredText)));
+        await Task.Delay(speed * 2);
     }
+    
+    AnsiConsole.WriteLine();
+    AnsiConsole.WriteLine();
+}
 
     private async Task RainbowDataVisualization(SolarData data, int speed)
     {
