@@ -90,7 +90,7 @@ namespace SolarScope
         //    {
         //        h.AdditionalNewLineAfterOption = false;
         //        h.Heading = "SolarScope CLI v1.0.0";
-        //        h.Copyright = "For the Love of Code 2025 - Built with ❤️ by Sujith Quintelier";
+        //        h.Copyright = "For the Love of Code 2025 - Built with ❤  by Sujith Quintelier";
         //        h.AddDashesToOption = true;
         //        h.AddEnumValuesToHelpText = true;
         //        return h;

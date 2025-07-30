@@ -437,9 +437,9 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         var sunnyDays = latestYearData.Count(d => d.MS.Condition == WeatherCondition.Sunny);
 
         var stats = new Panel(new Markup(
-            $"[yellow]🌡️ Average Temperature: {avgTemp:F1}°C[/]\n" +
-            $"[blue]🌧️ Total Precipitation: {totalPrecip:F1}mm[/]\n" +
-            $"[orange1]☀️ Total Sunshine: {totalSunshine:F1} hours[/]\n" +
+            $"[yellow]🌡 Average Temperature: {avgTemp:F1}°C[/]\n" +
+            $"[blue]🌧 Total Precipitation: {totalPrecip:F1}mm[/]\n" +
+            $"[orange1]☀ Total Sunshine: {totalSunshine:F1} hours[/]\n" +
             $"[green]🌞 Sunny Days: {sunnyDays} ({(double)sunnyDays / latestYearData.Count * 100:F1}%)[/]"))
         {
             Header = new PanelHeader("[bold]Weather Statistics[/]"),
@@ -485,9 +485,9 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         var insights = new List<string>
         {
             $"🎯 Strongest correlation: {strongest}",
-            $"☀️ Sunshine impact: {GetCorrelationDescription(correlation.SunshineCorrelation)}",
-            $"🌡️ Temperature impact: {GetCorrelationDescription(correlation.TemperatureCorrelation)}",
-            $"🌧️ Rain impact: {GetCorrelationDescription(correlation.PrecipitationCorrelation)}"
+            $"☀ Sunshine impact: {GetCorrelationDescription(correlation.SunshineCorrelation)}",
+            $"🌡 Temperature impact: {GetCorrelationDescription(correlation.TemperatureCorrelation)}",
+            $"🌧 Rain impact: {GetCorrelationDescription(correlation.PrecipitationCorrelation)}"
         };
 
         var insightPanel = new Panel(string.Join("\n", insights.Select(i => $"• {i}")))
@@ -502,7 +502,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
 
     private static string GetWeatherSummary(MeteoStatData weather)
     {
-        return $"{weather.Condition} ({weather.SunshineHours:F1}h ☀️)";
+        return $"{weather.Condition} ({weather.SunshineHours:F1}h ☀)";
     }
 
     private static string GetPotentialCause(BarChartData day)
@@ -532,11 +532,11 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
     {
         return condition switch
         {
-            WeatherCondition.Sunny => "☀️",
+            WeatherCondition.Sunny => "☀",
             WeatherCondition.PartlyCloudy => "⛅",
-            WeatherCondition.Cloudy => "☁️",
-            WeatherCondition.Overcast => "🌫️",
-            WeatherCondition.Rainy => "🌧️",
+            WeatherCondition.Cloudy => "☁",
+            WeatherCondition.Overcast => "🌫",
+            WeatherCondition.Rainy => "🌧",
             _ => "❓"
         };
     }

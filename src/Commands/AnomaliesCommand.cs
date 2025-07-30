@@ -48,7 +48,7 @@ public class AnomaliesCommand : AsyncCommand<AnomaliesCommand.Settings>
         }
 
         // Display header
-        var headerRule = new Rule("[bold red]⚠️ Anomaly Detection Analysis ⚠️[/]")
+        var headerRule = new Rule("[bold red]❗ Anomaly Detection Analysis ❗[/]")
         {
             Style = Style.Parse("red"),
             Justification = Justify.Center
@@ -209,7 +209,7 @@ public class AnomaliesCommand : AsyncCommand<AnomaliesCommand.Settings>
         while (true)
         {
             AnsiConsole.Clear();
-            var headerRule = new Rule($"[bold red]⚠️ Interactive Anomaly Explorer - Year {selectedYear} ⚠️[/]")
+            var headerRule = new Rule($"[bold red]❗ Interactive Anomaly Explorer - Year {selectedYear} ❗[/]")
             {
                 Style = Style.Parse("red"),
                 Justification = Justify.Center
@@ -324,7 +324,7 @@ public class AnomaliesCommand : AsyncCommand<AnomaliesCommand.Settings>
         var anomalousData = yearData.Where(d => d.AS.HasAnomaly).ToList();
 
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[bold cyan]🌦️ Weather Pattern Analysis[/]");
+        AnsiConsole.MarkupLine("[bold cyan]🌦 Weather Pattern Analysis[/]");
 
         // Weather condition breakdown
         var weatherBreakdown = anomalousData

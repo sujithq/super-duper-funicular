@@ -1,5 +1,6 @@
 using SolarScope.Models;
 using SolarScope.Services;
+using SolarScope.Widges;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
@@ -121,7 +122,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     {
         var frames = new[]
         {
-            "        ☀️        \n      🌍    🔋   \n    ⚡  📊  ⚡   ",
+            "        ☀        \n      🌍    🔋   \n    ⚡  📊  ⚡   ",
             "        🌞        \n      🌍    🔋   \n    ⚡  📈  ⚡   ",
             "        ⭐        \n      🌍    🔋   \n    ⚡  📊  ⚡   ",
             "        ✨        \n      🌍    🔋   \n    ⚡  📈  ⚡   "
@@ -228,16 +229,16 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
 
     private async Task WeatherEffectsDemo(SolarData data, int speed)
     {
-        await TypewriterEffect("🌤️ Simulating weather effects on solar production...", speed);
+        await TypewriterEffect("🌤 Simulating weather effects on solar production...", speed);
         AnsiConsole.WriteLine();
 
         var weatherEmojis = new Dictionary<WeatherCondition, string>
         {
-            [WeatherCondition.Sunny] = "☀️",
+            [WeatherCondition.Sunny] = "☀",
             [WeatherCondition.PartlyCloudy] = "⛅",
-            [WeatherCondition.Cloudy] = "☁️",
-            [WeatherCondition.Overcast] = "🌫️",
-            [WeatherCondition.Rainy] = "🌧️"
+            [WeatherCondition.Cloudy] = "☁",
+            [WeatherCondition.Overcast] = "🌫",
+            [WeatherCondition.Rainy] = "🌧"
         };
 
         var weatherDays = data.GetLatestYearData().Take(7).ToList();
@@ -278,13 +279,19 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         
         AnsiConsole.WriteLine();
         AnsiConsole.WriteLine();
-        
-        var rule = new Rule("[bold green]Demo Complete - Keep Shining! ☀️[/]")
+
+        var rule = new Rule("[bold green]Demo Complete - Keep Shining! ☀[/]")
         {
             Style = Style.Parse("green"),
             Justification = Justify.Center
         };
         AnsiConsole.Write(rule);
+        var newRule = new NewRule("[bold green]Demo Complete - Keep Shining! ☀[/]")
+        {
+            Style = Style.Parse("green"),
+            Justification = Justify.Center
+        };
+        AnsiConsole.Write(newRule);
     }
 
     private async Task MatrixRainIntro(int speed)
@@ -311,7 +318,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
                             _ => "lime"
                         };
                         
-                        var chars = "01※⚡☀️🔋⚙️";
+                        var chars = "01※⚡☀🔋⚙️";
                         var char1 = chars[random.Next(chars.Length)];
                         AnsiConsole.Markup($"[{color}]{char1}[/]");
                     }

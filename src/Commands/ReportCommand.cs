@@ -173,7 +173,7 @@ public class ReportCommand : AsyncCommand<ReportCommand.Settings>
         }
 
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[bold red]⚠️ Lowest Performing Days[/]");
+        AnsiConsole.MarkupLine("[bold red]❗ Lowest Performing Days[/]");
         foreach (var day in bottomDays)
         {
             AnsiConsole.MarkupLine($"  D {day.D}: [red]{day.P:F2} kWh[/] " +
@@ -263,7 +263,7 @@ public class ReportCommand : AsyncCommand<ReportCommand.Settings>
 
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine($"[bold green]🏆 Best Week: Week {bestWeek.Week}[/] - {bestWeek.TotalProduction:F2} kWh");
-        AnsiConsole.MarkupLine($"[bold red]⚠️ Worst Week: Week {worstWeek.Week}[/] - {worstWeek.TotalProduction:F2} kWh");
+        AnsiConsole.MarkupLine($"[bold red]❗ Worst Week: Week {worstWeek.Week}[/] - {worstWeek.TotalProduction:F2} kWh");
     }
 
     private async Task DisplayMonthlyReport(SolarData data, Settings options)
@@ -350,7 +350,7 @@ public class ReportCommand : AsyncCommand<ReportCommand.Settings>
 
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine($"[bold green]🏆 Best Month: {bestMonthLabel}[/] - {bestMonth.Value.TotalProduction:F2} kWh");
-        AnsiConsole.MarkupLine($"[bold red]⚠️ Worst Month: {worstMonthLabel}[/] - {worstMonth.Value.TotalProduction:F2} kWh");
+        AnsiConsole.MarkupLine($"[bold red]❗ Worst Month: {worstMonthLabel}[/] - {worstMonth.Value.TotalProduction:F2} kWh");
     }
 
     private async Task DisplayYearlyReport(SolarData data, Settings options)
