@@ -567,20 +567,31 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     private async Task RainbowFinale(int speed)
     {
         AnsiConsole.WriteLine();
-        
+
         var rainbow = "🌈✨🎉🌟💫⭐🎊✨🌈";
-        
+
+        // Split rainbow into grapheme clusters (text elements)
+        var elements = new List<string>();
+        var enumerator = System.Globalization.StringInfo.GetTextElementEnumerator(rainbow);
+        while (enumerator.MoveNext())
+            elements.Add(enumerator.GetTextElement());
+
+        int count = elements.Count;
+
         for (int i = 0; i < 15; i++)
         {
             AnsiConsole.Clear();
-            var rotated = rainbow.Substring(i % rainbow.Length) + rainbow.Substring(0, i % rainbow.Length);
-            
-            AnsiConsole.Write(Align.Center(new Markup("[bold]{rotated}[/]")));
+
+            // Rotate the list of elements
+            var rotated = elements.Skip(i % count).Concat(elements.Take(i % count));
+            var rotatedString = string.Concat(rotated);
+
+            AnsiConsole.Write(Align.Center(new Markup($"[bold]{rotatedString}[/]")));
             AnsiConsole.WriteLine();
             AnsiConsole.Write(Align.Center(new Markup("[bold magenta]SOLAR RAINBOW COMPLETE![/]")));
             AnsiConsole.WriteLine();
-            AnsiConsole.Write(Align.Center(new Markup("[bold]{rotated}[/]")));
-            
+            AnsiConsole.Write(Align.Center(new Markup($"[bold]{rotatedString}[/]")));
+
             await Task.Delay(speed * 2);
         }
     }
