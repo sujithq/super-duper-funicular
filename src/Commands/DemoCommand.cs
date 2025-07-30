@@ -56,10 +56,10 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     private async Task SolarThemeDemo(SolarData data, int speed)
     {
         AnsiConsole.Clear();
-
+        
         // Animated solar system ASCII art
         await DisplayAnimatedSolarSystem(speed);
-
+        
         // Welcome animation
         await TypewriterEffect("🌞 Welcome to SolarScope - Your Solar Journey Begins! 🌞", speed);
         AnsiConsole.WriteLine();
@@ -67,13 +67,13 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
 
         // Animated data loading
         await SimulateDataLoading(data, speed);
-
+        
         // Solar production animation
         await AnimatedProductionVisualization(data, speed);
-
+        
         // Weather effects animation
         await WeatherEffectsDemo(data, speed);
-
+        
         // Finale
         await SolarFinale(speed);
     }
@@ -81,10 +81,10 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     private async Task MatrixThemeDemo(SolarData data, int speed)
     {
         AnsiConsole.Clear();
-
+        
         // Matrix-style intro
         await MatrixRainIntro(speed);
-
+        
         await TypewriterEffect("[green]SOLAR MATRIX INITIALIZED...[/]", speed);
         await TypewriterEffect("[green]ACCESSING ENERGY GRID...[/]", speed);
         await TypewriterEffect("[green]LOADING POWER MATRIX...[/]", speed);
@@ -92,26 +92,26 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
 
         // Matrix-style data display
         await MatrixDataVisualization(data, speed);
-
+        
         // Glitch effects
         await MatrixGlitchEffect(speed);
-
+        
         await TypewriterEffect("[green]SOLAR MATRIX COMPLETE. SYSTEM OPTIMAL.[/]", speed);
     }
 
     private async Task RainbowThemeDemo(SolarData data, int speed)
     {
         AnsiConsole.Clear();
-
+        
         // Rainbow intro
         await RainbowIntro(speed);
-
+        
         // Colorful data presentation
         await RainbowDataVisualization(data, speed);
-
+        
         // Dancing charts
         await RainbowChartAnimation(data, speed);
-
+        
         // Rainbow finale
         await RainbowFinale(speed);
     }
@@ -130,7 +130,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         {
             AnsiConsole.Clear();
             var frame = frames[i % frames.Length];
-
+            
             var panel = new Panel(frame)
             {
                 Header = new PanelHeader("[bold yellow]Solar System Dashboard[/]"),
@@ -138,41 +138,35 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
                 BorderStyle = Style.Parse("yellow"),
                 Padding = new Padding(2, 1)
             };
-
+            
             AnsiConsole.Write(Align.Center(panel));
             await Task.Delay(speed * 2);
         }
-
+        
         AnsiConsole.Clear();
     }
 
     private async Task TypewriterEffect(string text, int speed, bool newLine = true)
     {
-        // foreach (var word in text.Split(' ')) // crude, but works for emoji+text
-        // {
-        //     AnsiConsole.Markup(word + " ");
-        //     await Task.Delay(speed);
-        // }
-
         foreach (var word in text.Split(' '))
+    {
+        // If the word is all letters/numbers, type it char by char
+        if (word.All(char.IsLetterOrDigit))
         {
-            // If the word is all letters/numbers, type it char by char
-            if (word.All(char.IsLetterOrDigit))
+            foreach (char c in word)
             {
-                foreach (char c in word)
-                {
-                    AnsiConsole.Markup(Markup.Escape(c.ToString()));
-                    await Task.Delay(speed / 2);
-                }
-                AnsiConsole.Markup(" ");
+                AnsiConsole.Markup(Markup.Escape(c.ToString()));
+                await Task.Delay(speed / 2);
             }
-            else
-            {
-                // For emoji or non-word, print as a whole
-                AnsiConsole.Markup(Markup.Escape(word) + " ");
-                await Task.Delay(speed);
-            }
+            AnsiConsole.Markup(" ");
         }
+        else
+        {
+            // For emoji or non-word, print as a whole
+            AnsiConsole.Markup(Markup.Escape(word) + " ");
+            await Task.Delay(speed);
+        }
+    }
 
         if (newLine) AnsiConsole.WriteLine();
     }
@@ -195,7 +189,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
             var task4 = ctx.AddTask("[red]Detecting anomalies[/]");
 
             var tasks = new[] { task1, task2, task3, task4 };
-
+            
             while (!ctx.IsFinished)
             {
                 foreach (var task in tasks)
@@ -205,7 +199,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
                 }
             }
         });
-
+        
         AnsiConsole.WriteLine();
         await TypewriterEffect($"✅ Loaded {data.TotalDays} days of solar data successfully!", speed);
         AnsiConsole.WriteLine();
@@ -217,7 +211,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         AnsiConsole.WriteLine();
 
         var recentDays = data.GetLatestYearData().TakeLast(10).ToList();
-
+        
         await AnsiConsole.Live(new Panel("Initializing..."))
             .StartAsync(async ctx =>
             {
@@ -236,7 +230,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
                             > 10 => Color.Yellow,
                             _ => Color.Orange1
                         };
-
+                        
                         chart.AddItem($"D {day.D}", day.P, color);
                     }
 
@@ -269,7 +263,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         };
 
         var weatherDays = data.GetLatestYearData().Take(7).ToList();
-
+        
         foreach (var day in weatherDays)
         {
             var emoji = weatherEmojis[day.MS.Condition];
@@ -284,7 +278,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
             AnsiConsole.MarkupLine($"{emoji} D {day.D}: [{color}]{productionBar}[/] {day.P:F1} kWh");
             await Task.Delay(speed * 4);
         }
-
+        
         AnsiConsole.WriteLine();
     }
 
@@ -296,17 +290,17 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
 
         // Celebration animation
         var celebrationFrames = new[] { "🎉", "🎊", "✨", "🌟", "⭐", "💫" };
-
+        
         for (int i = 0; i < 20; i++)
         {
             var frame = celebrationFrames[i % celebrationFrames.Length];
             AnsiConsole.Markup($"\r{frame} Thank you for using SolarScope! {frame}");
             await Task.Delay(speed * 2);
         }
-
+        
         AnsiConsole.WriteLine();
         AnsiConsole.WriteLine();
-
+        
         var rule = new Rule("[bold green]Demo Complete - Keep Shining! ☀️[/]")
         {
             Style = Style.Parse("green"),
@@ -320,11 +314,11 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         var random = new Random();
         var width = Console.WindowWidth;
         var height = 15;
-
+        
         for (int frame = 0; frame < 30; frame++)
         {
             AnsiConsole.Clear();
-
+            
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x += 2)
@@ -338,7 +332,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
                             1 => "green",
                             _ => "lime"
                         };
-
+                        
                         var chars = "01※⚡☀️🔋⚙️";
                         var char1 = chars[random.Next(chars.Length)];
                         AnsiConsole.Markup($"[{color}]{char1}[/]");
@@ -350,7 +344,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
                 }
                 AnsiConsole.WriteLine();
             }
-
+            
             await Task.Delay(speed);
         }
     }
@@ -358,7 +352,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     private async Task MatrixDataVisualization(SolarData data, int speed)
     {
         var (totalProduction, totalConsumption, totalInjection) = data.YearlyTotals;
-
+        
         var matrixData = new[]
         {
             $"[green]TOTAL_PRODUCTION: {totalProduction:F2} KWH[/]",
@@ -379,7 +373,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     private async Task MatrixGlitchEffect(int speed)
     {
         AnsiConsole.WriteLine();
-
+        
         var glitchFrames = new[]
         {
             "[red]ERROR: ANOMALY DETECTED[/]",
@@ -399,22 +393,22 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     {
         var colors = new[] { "red", "orange1", "yellow", "green", "blue", "purple", "magenta" };
         var text = "🌈 RAINBOW SOLAR SPECTACULAR 🌈";
-
+        
         for (int i = 0; i < 10; i++)
         {
             AnsiConsole.Clear();
             var coloredText = "";
-
+            
             for (int j = 0; j < text.Length; j++)
             {
                 var colorIndex = (i + j) % colors.Length;
                 coloredText += $"[{colors[colorIndex]}]{text[j]}[/]";
             }
-
+            
             AnsiConsole.Write(Align.Center(new Markup(coloredText)));
             await Task.Delay(speed * 2);
         }
-
+        
         AnsiConsole.WriteLine();
         AnsiConsole.WriteLine();
     }
@@ -423,7 +417,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     {
         var colors = new[] { "red", "orange1", "yellow", "green", "cyan", "blue", "magenta" };
         var (totalProduction, totalConsumption, totalInjection) = data.YearlyTotals;
-
+        
         var dataPoints = new[]
         {
             ("Production", totalProduction, "⚡"),
@@ -437,7 +431,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         {
             var (label, value, emoji) = dataPoints[i];
             var color = colors[i % colors.Length];
-
+            
             await TypewriterEffect($"[{color}]{emoji} {label}: {value:F1}[/]", speed);
             await Task.Delay(speed);
         }
@@ -451,7 +445,7 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
 
         var colors = new[] { Color.Red, Color.Orange1, Color.Yellow, Color.Green, Color.Cyan1, Color.Blue, Color.Magenta1 };
         var recentDays = data.GetLatestYearData().TakeLast(7).ToList();
-
+        
         var chart = new BarChart()
             .Width(70)
             .Label("[bold]🌈 Rainbow Energy Production Chart 🌈[/]")
@@ -471,20 +465,20 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
     private async Task RainbowFinale(int speed)
     {
         AnsiConsole.WriteLine();
-
+        
         var rainbow = "🌈✨🎉🌟💫⭐🎊✨🌈";
-
+        
         for (int i = 0; i < 15; i++)
         {
             AnsiConsole.Clear();
             var rotated = rainbow.Substring(i % rainbow.Length) + rainbow.Substring(0, i % rainbow.Length);
-
+            
             AnsiConsole.Write(Align.Center(new Markup("[bold]{rotated}[/]")));
             AnsiConsole.WriteLine();
             AnsiConsole.Write(Align.Center(new Markup("[bold magenta]SOLAR RAINBOW COMPLETE![/]")));
             AnsiConsole.WriteLine();
             AnsiConsole.Write(Align.Center(new Markup("[bold]{rotated}[/]")));
-
+            
             await Task.Delay(speed * 2);
         }
     }
