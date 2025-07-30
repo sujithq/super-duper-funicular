@@ -23,12 +23,12 @@ SolarScope CLI is a beautiful, interactive command-line tool for monitoring and 
 - **.NET 9.0** - Modern, cross-platform framework
 - **C# 13** - Latest language features with records and pattern matching
 - **Spectre.Console 0.49.1** - Beautiful terminal UI with charts and animations
-- **CommandLineParser 2.9.1** - Robust command-line argument parsing
+- **Spectre.Console.Cli 2.x** - Modern command-line argument parsing and command structure
 - **System.Text.Json 9.0.7** - High-performance JSON processing
 
 ## Architecture Principles
 
-- **Command Pattern** - Separate command classes for each feature
+- **Command Pattern (Spectre.Console.Cli)** - Each command inherits from `AsyncCommand<TSettings>` and uses a nested `Settings : CommandSettings` class with `[CommandOption]` attributes for arguments
 - **Service Layer Pattern** - Business logic separated from presentation
 - **Record Types** - Immutable data models with computed properties
 - **Async/Await** - Non-blocking operations with progress indication
@@ -52,8 +52,15 @@ SolarScope CLI is a beautiful, interactive command-line tool for monitoring and 
 - Implement data validation where appropriate
 - Use nullable reference types when data might be missing
 
-### Terminal UI Design
+### Terminal UI & Command Design
 - Use Spectre.Console for all UI elements
+- Use Spectre.Console.Cli for all command definitions and argument parsing
+- Each command should:
+  - Inherit from `AsyncCommand<TSettings>` (or `Command<TSettings>` for sync)
+  - Define a nested `Settings : BaseCommandSettings` class
+  - Use `[CommandOption]` for all CLI arguments
+  - Add `[Description]` and `[DefaultValue]` as needed
+  - Implement `ExecuteAsync(CommandContext, Settings)` as the entry point
 - Maintain consistent color schemes:
   - **Green** for production/positive metrics
   - **Blue** for consumption/neutral metrics
