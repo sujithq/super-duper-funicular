@@ -106,7 +106,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
             $"[orange1]Grid Injection: {totalInj:F2} kWh[/]\n" +
             $"[yellow]Daily Average: {avgDaily:F2} kWh[/]\n\n" +
             $"[green]🏆 Best D: D {bestDay.D} ({bestDay.P:F2} kWh)[/]\n" +
-            $"[red]⚠️ Worst D: D {worstDay.D} ({worstDay.P:F2} kWh)[/]"))
+            $"[red]❗ Worst D: D {worstDay.D} ({worstDay.P:F2} kWh)[/]"))
         {
             Header = new PanelHeader("[bold]Quick Overview[/]"),
             Border = BoxBorder.Rounded,
@@ -137,7 +137,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
 
         var bottomTable = new Table()
             .Border(TableBorder.Minimal)
-            .Title("[bold red]⚠️ Bottom 5 Production Days[/]")
+            .Title("[bold red]❗ Bottom 5 Production Days[/]")
             .AddColumn("[yellow]D[/]")
             .AddColumn("[red]Production[/]")
             .AddColumn("[cyan]Weather[/]");
@@ -162,7 +162,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
         // Anomaly summary
         var anomalies = dataService.GetAnomalousData(data, selectedYear);
         var anomalyPanel = new Panel(new Markup(
-            $"[red]⚠️ Anomalies Detected: {anomalies.Count}[/]\n" +
+            $"[red]❗ Anomalies Detected: {anomalies.Count}[/]\n" +
             $"[orange1]High Severity: {anomalies.Count(a => a.AS.Severity == AnomalySeverity.High)}[/]\n" +
             $"[yellow]Medium Severity: {anomalies.Count(a => a.AS.Severity == AnomalySeverity.Medium)}[/]\n" +
             $"[green]Low Severity: {anomalies.Count(a => a.AS.Severity == AnomalySeverity.Low)}[/]"))
@@ -279,8 +279,8 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
                     .AddChoices(new[]
                     {
                         "📊 Data Analysis",
-                        "🌦️ Weather Exploration", 
-                        "⚠️ Anomaly Deep Dive",
+                        "🌦 Weather Exploration", 
+                        "❗ Anomaly Deep Dive",
                         "🔍 Advanced Inspection",
                         "📈 Performance Optimization",
                         "⚙️ System Configuration",
@@ -293,11 +293,11 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
                     await DataAnalysisMenu(data, dataService, selectedYear);
                     break;
 
-                case "🌦️ Weather Exploration":
+                case "🌦 Weather Exploration":
                     await WeatherExplorationMenu(data, dataService, selectedYear);
                     break;
 
-                case "⚠️ Anomaly Deep Dive":
+                case "❗ Anomaly Deep Dive":
                     await AnomalyDeepDiveMenu(data, dataService, selectedYear);
                     break;
 
@@ -455,12 +455,12 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
         var correlation = dataService.AnalyzeWeatherCorrelation(data, year);
 
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine($"[bold cyan]🌦️ Weather Impact Analysis - Year {year}[/]");
+        AnsiConsole.MarkupLine($"[bold cyan]🌦 Weather Impact Analysis - Year {year}[/]");
 
         var impactPanel = new Panel(new Markup(
-            $"[yellow]☀️ Sunshine Correlation: {correlation.SunshineCorrelation:F3}[/]\n" +
-            $"[red]🌡️ Temperature Correlation: {correlation.TemperatureCorrelation:F3}[/]\n" +
-            $"[blue]🌧️ Precipitation Correlation: {correlation.PrecipitationCorrelation:F3}[/]\n" +
+            $"[yellow]☀ Sunshine Correlation: {correlation.SunshineCorrelation:F3}[/]\n" +
+            $"[red]🌡 Temperature Correlation: {correlation.TemperatureCorrelation:F3}[/]\n" +
+            $"[blue]🌧 Precipitation Correlation: {correlation.PrecipitationCorrelation:F3}[/]\n" +
             $"[gray]💨 Wind Speed Correlation: {correlation.WindCorrelation:F3}[/]"))
         {
             Header = new PanelHeader("[bold]Weather Correlations[/]"),
@@ -511,7 +511,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
         var anomalies = dataService.GetAnomalousData(data, year);
 
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine($"[bold cyan]⚠️ Anomaly Investigation - Year {year}[/]");
+        AnsiConsole.MarkupLine($"[bold cyan]❗ Anomaly Investigation - Year {year}[/]");
 
         if (!anomalies.Any())
         {
@@ -598,7 +598,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
         var efficiencyPanel = new Panel(new Markup(
             $"[green]📊 Average System Efficiency: {avgEfficiency:F1}%[/]\n" +
             $"[yellow]🔋 High Efficiency Days (>90%): {highEfficiencyDays}[/]\n" +
-            $"[red]⚠️ Low Efficiency Days (<50%): {lowEfficiencyDays}[/]\n" +
+            $"[red]❗ Low Efficiency Days (<50%): {lowEfficiencyDays}[/]\n" +
             $"[blue]📈 Best Efficiency: {efficiencyData.First().Efficiency:F1}% (D {efficiencyData.First().Day})[/]\n" +
             $"[orange1]📉 Worst Efficiency: {efficiencyData.Last().Efficiency:F1}% (D {efficiencyData.Last().Day})[/]"))
         {
@@ -690,7 +690,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
 
         var comparisonPanel = new Panel(new Markup(
             $"[green]🏆 Best Month: {monthNames[bestMonth.Key]} ({bestMonth.Value.TotalProduction:F2} kWh)[/]\n" +
-            $"[red]⚠️ Worst Month: {monthNames[worstMonth.Key]} ({worstMonth.Value.TotalProduction:F2} kWh)[/]\n" +
+            $"[red]❗ Worst Month: {monthNames[worstMonth.Key]} ({worstMonth.Value.TotalProduction:F2} kWh)[/]\n" +
             $"[yellow]📊 Monthly Average: {monthlyStats.Average(m => m.Value.TotalProduction):F2} kWh[/]"))
         {
             Header = new PanelHeader("[bold]Monthly Comparison[/]"),
@@ -734,7 +734,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
             $"[blue]🏠 Consumption: {dayData.U:F2} kWh[/]\n" +
             $"[orange1]🔌 Grid Injection: {dayData.I:F2} kWh[/]\n" +
             $"[yellow]📊 Efficiency: {dayData.Efficiency:F1}%[/]\n" +
-            $"[white]⚖️ Energy Balance: {dayData.EnergyBalance:F2} kWh[/]\n" +
+            $"[white]⚖ Energy Balance: {dayData.EnergyBalance:F2} kWh[/]\n" +
             $"[purple]📈 Peak Production: {dayData.PeakProduction:F2} kWh[/]"))
         {
             Header = new PanelHeader("[bold]Production Metrics[/]"),
@@ -743,10 +743,10 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
         };
 
         var weatherPanel = new Panel(new Markup(
-            $"[yellow]🌤️ Condition: {dayData.MS.Condition}[/]\n" +
-            $"[red]🌡️ Temperature: {dayData.MS.AverageTemp:F1}°C ({dayData.MS.MinTemp:F1}°C - {dayData.MS.MaxTemp:F1}°C)[/]\n" +
-            $"[blue]🌧️ Precipitation: {dayData.MS.Precipitation:F1}mm[/]\n" +
-            $"[orange1]☀️ Sunshine: {dayData.MS.SunshineHours:F1} hours[/]\n" +
+            $"[yellow]🌤 Condition: {dayData.MS.Condition}[/]\n" +
+            $"[red]🌡 Temperature: {dayData.MS.AverageTemp:F1}°C ({dayData.MS.MinTemp:F1}°C - {dayData.MS.MaxTemp:F1}°C)[/]\n" +
+            $"[blue]🌧 Precipitation: {dayData.MS.Precipitation:F1}mm[/]\n" +
+            $"[orange1]☀ Sunshine: {dayData.MS.SunshineHours:F1} hours[/]\n" +
             $"[gray]💨 Wind: {dayData.MS.WindSpeed:F1} km/h ({dayData.MS.WindCondition})[/]\n" +
             $"[white]🔽 Pressure: {dayData.MS.Pressure:F1} hPa[/]"))
         {

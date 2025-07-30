@@ -46,7 +46,7 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
             }
 
             // Display header
-            var headerRule = new Rule("[bold blue]🌦️ Weather Analysis & Solar Production Correlation 🌦️[/]")
+            var headerRule = new Rule("[bold blue]🌦 Weather Analysis & Solar Production Correlation 🌦[/]")
             {
                 Style = Style.Parse("blue"),
                 Justification = Justify.Center
@@ -189,10 +189,10 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
         var sunniestDay = yearData.OrderByDescending(d => d.MS.SunshineHours).First();
 
         var extremesPanel = new Panel(new Markup(
-            $"[red]🌡️ Hottest D: D {hottestDay.D} ({hottestDay.MS.MaxTemp:F1}°C) - {hottestDay.P:F2} kWh[/]\n" +
-            $"[blue]❄️ Coldest D: D {coldestDay.D} ({coldestDay.MS.MinTemp:F1}°C) - {coldestDay.P:F2} kWh[/]\n" +
-            $"[cyan]🌧️ Rainiest D: D {rainiestDay.D} ({rainiestDay.MS.Precipitation:F1}mm) - {rainiestDay.P:F2} kWh[/]\n" +
-            $"[yellow]☀️ Sunniest D: D {sunniestDay.D} ({sunniestDay.MS.SunshineHours:F1}h) - {sunniestDay.P:F2} kWh[/]"))
+            $"[red]🌡 Hottest D: D {hottestDay.D} ({hottestDay.MS.MaxTemp:F1}°C) - {hottestDay.P:F2} kWh[/]\n" +
+            $"[blue]❄ Coldest D: D {coldestDay.D} ({coldestDay.MS.MinTemp:F1}°C) - {coldestDay.P:F2} kWh[/]\n" +
+            $"[cyan]🌧 Rainiest D: D {rainiestDay.D} ({rainiestDay.MS.Precipitation:F1}mm) - {rainiestDay.P:F2} kWh[/]\n" +
+            $"[yellow]☀ Sunniest D: D {sunniestDay.D} ({sunniestDay.MS.SunshineHours:F1}h) - {sunniestDay.P:F2} kWh[/]"))
         {
             Header = new PanelHeader("[bold]Weather Extremes[/]"),
             Border = BoxBorder.Rounded,
@@ -300,14 +300,14 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
         var worstSunDays = yearData.OrderBy(d => d.MS.SunshineHours).Take(5);
 
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[bold green]☀️ Best Sunshine Days[/]");
+        AnsiConsole.MarkupLine("[bold green]☀ Best Sunshine Days[/]");
         foreach (var day in bestSunDays)
         {
             AnsiConsole.MarkupLine($"  D {day.D}: [yellow]{day.MS.SunshineHours:F1}h sun[/] → [green]{day.P:F2} kWh[/]");
         }
 
         AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[bold red]☁️ Worst Sunshine Days[/]");
+        AnsiConsole.MarkupLine("[bold red]☁ Worst Sunshine Days[/]");
         foreach (var day in worstSunDays)
         {
             AnsiConsole.MarkupLine($"  D {day.D}: [gray]{day.MS.SunshineHours:F1}h sun[/] → [red]{day.P:F2} kWh[/]");
@@ -425,9 +425,9 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
 
         var patternsPanel = new Panel(new Markup(
             $"[green]🏆 Best Production Month: {monthNames[Math.Min(bestMonth.Month, 12)]} ({bestMonth.AvgProduction:F2} kWh avg)[/]\n" +
-            $"[red]⚠️ Worst Production Month: {monthNames[Math.Min(worstMonth.Month, 12)]} ({worstMonth.AvgProduction:F2} kWh avg)[/]\n" +
-            $"[yellow]🌡️ Hottest Month: {monthNames[Math.Min(hottestMonth.Month, 12)]} ({hottestMonth.AvgTemp:F1}°C)[/]\n" +
-            $"[blue]🌧️ Rainiest Month: {monthNames[Math.Min(rainiest.Month, 12)]} ({rainiest.TotalPrecip:F1}mm)[/]"))
+            $"[red]❗ Worst Production Month: {monthNames[Math.Min(worstMonth.Month, 12)]} ({worstMonth.AvgProduction:F2} kWh avg)[/]\n" +
+            $"[yellow]🌡 Hottest Month: {monthNames[Math.Min(hottestMonth.Month, 12)]} ({hottestMonth.AvgTemp:F1}°C)[/]\n" +
+            $"[blue]🌧 Rainiest Month: {monthNames[Math.Min(rainiest.Month, 12)]} ({rainiest.TotalPrecip:F1}mm)[/]"))
         {
             Header = new PanelHeader("[bold]Weather Pattern Highlights[/]"),
             Border = BoxBorder.Rounded,
@@ -540,14 +540,14 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
         // Sunshine correlation recommendations
         if (correlation.SunshineCorrelation > 0.7)
         {
-            recommendations.Add("[green]☀️ Strong sunshine correlation detected![/]\n" +
+            recommendations.Add("[green]☀ Strong sunshine correlation detected![/]\n" +
                               "   • Optimize panel positioning for maximum sun exposure\n" +
                               "   • Consider tracking systems for better sun following\n" +
                               "   • Clear any obstructions that cast shadows");
         }
         else if (correlation.SunshineCorrelation < 0.5)
         {
-            recommendations.Add("[orange1]☁️ Low sunshine correlation suggests potential issues[/]\n" +
+            recommendations.Add("[orange1]☁ Low sunshine correlation suggests potential issues[/]\n" +
                               "   • Check for panel soiling or degradation\n" +
                               "   • Verify inverter performance and efficiency\n" +
                               "   • Consider professional system inspection");
@@ -556,7 +556,7 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
         // Temperature correlation recommendations
         if (correlation.TemperatureCorrelation < -0.3)
         {
-            recommendations.Add("[blue]🌡️ Negative temperature correlation detected[/]\n" +
+            recommendations.Add("[blue]🌡 Negative temperature correlation detected[/]\n" +
                               "   • High temperatures reduce panel efficiency\n" +
                               "   • Improve ventilation around panels\n" +
                               "   • Consider cooling systems for extreme heat");
@@ -572,7 +572,7 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
         // Precipitation recommendations
         if (Math.Abs(correlation.PrecipitationCorrelation) > 0.5)
         {
-            recommendations.Add("[cyan]🌧️ Significant precipitation impact detected[/]\n" +
+            recommendations.Add("[cyan]🌧 Significant precipitation impact detected[/]\n" +
                               "   • Rain can clean panels naturally\n" +
                               "   • Ensure proper drainage around installation\n" +
                               "   • Monitor for water damage or corrosion");

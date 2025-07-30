@@ -119,7 +119,7 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
     {
         var frames = new[]
         {
-            "☀️ Solar System Dashboard ☀️",
+            "☀ Solar System Dashboard ☀",
             "🌞 Solar System Dashboard 🌞",
             "⭐ Solar System Dashboard ⭐",
             "🌟 Solar System Dashboard 🌟",
@@ -191,7 +191,7 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
         statsTable.AddRow(
             "System Anomalies", 
             $"[red]{anomalyCount} detected[/]", 
-            anomalyCount == 0 ? "✅" : "⚠️"
+            anomalyCount == 0 ? "✅" : "❗"
         );
 
         var panel = new Panel(statsTable)
@@ -362,7 +362,7 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
         var quickStats = new Panel(new Markup(
             $"[green]📊 Total Production: {totalProduction:F1} kWh[/]\n" +
             $"[blue]⚡ Total Consumption: {totalConsumption:F1} kWh[/]\n" +
-            $"[yellow]⚖️ Energy Balance: {(balance >= 0 ? "+" : "")}{balance:F1} kWh[/]\n" +
+            $"[yellow]⚖ Energy Balance: {(balance >= 0 ? "+" : "")}{balance:F1} kWh[/]\n" +
             $"[cyan]🎯 System Efficiency: {efficiency:F1}%[/]\n\n" +
             $"[dim]💡 Use --full for detailed dashboard[/]"))
         {
@@ -376,7 +376,7 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
 
     private void DisplayFooter()
     {
-        var rule = new Rule("[dim]Built with ❤️ for GitHub's For the Love of Code 2025[/]")
+        var rule = new Rule("[dim]Built with ❤  for GitHub's For the Love of Code 2025[/]")
         {
             Style = Style.Parse("dim"),
             Justification = Justify.Center
@@ -386,16 +386,16 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
 
     private static string GetStatusEmoji(double value, double threshold)
     {
-        return value >= threshold ? "✅" : value >= threshold * 0.7 ? "⚠️" : "❌";
+        return value >= threshold ? "✅" : value >= threshold * 0.7 ? "❗" : "❌";
     }
 
     private static string GetTempTrend(double temp)
     {
         return temp switch
         {
-            > 20 => "🌡️ Warm",
-            > 10 => "🌤️ Mild",
-            _ => "❄️ Cool"
+            > 20 => "🌡 Warm",
+            > 10 => "🌤 Mild",
+            _ => "❄ Cool"
         };
     }
 
@@ -403,9 +403,9 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
     {
         return precip switch
         {
-            > 100 => "🌧️ Wet",
-            > 50 => "🌦️ Moderate",
-            _ => "☀️ Dry"
+            > 100 => "🌧 Wet",
+            > 50 => "🌦 Moderate",
+            _ => "☀ Dry"
         };
     }
 
@@ -413,9 +413,9 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
     {
         return sunshine switch
         {
-            > 8 => "☀️ Excellent",
+            > 8 => "☀ Excellent",
             > 5 => "⛅ Good",
-            _ => "☁️ Limited"
+            _ => "☁ Limited"
         };
     }
 }

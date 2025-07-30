@@ -213,7 +213,7 @@ solarscope demo --theme rainbow --speed fast
 │ 🔌 Grid Injection: 690.7 kWh        ✅ │
 │ 📊 Average Daily: 12.8 kWh          ✅ │
 │ 🏆 Best Day: Day 156 (28.4 kWh)     🏆 │
-│ ⚠️ System Anomalies: 3 detected     ⚠️ │
+│ ❗ System Anomalies: 3 detected     ❗ │
 └─────────────────────────────────────────┘
 ```
 
@@ -228,7 +228,7 @@ Day 344  Day 348  Day 352  Day 356  Day 360
 ### Anomaly Detection
 
 ```
-⚠️ Anomaly Detection Results
+❗ Anomaly Detection Results
 ┌─────────────────────────────────────┐
 │ High Severity:    2 occurrences    │
 │ Medium Severity:  5 occurrences    │  
