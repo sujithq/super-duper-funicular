@@ -1,56 +1,94 @@
 using Spectre.Console;
+using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using System.ComponentModel;
 
 namespace SolarScope.Commands;
 
 /// <summary>
-/// Report command implementation
+/// Report command implementation (Spectre.Console.Cli)
 /// </summary>
-public class ReportCommand
+public class ReportCommand : AsyncCommand<ReportCommand.Settings>
 {
-    public async Task ExecuteAsync(ReportOptions options)
+    public class Settings : BaseCommandSettings
     {
-        var dataService = new SolarDataService(options.DataFile);
-        var data = await dataService.LoadDataAsync();
-        
-        if (data == null)
+        [CommandOption("--period")]
+        [Description("Report period: daily, weekly, monthly, or yearly")]
+        [DefaultValue("monthly")]
+        public string Period { get; set; } = "monthly";
+
+        [CommandOption("--year")]
+        [Description("Year to report (optional)")]
+        public int? Year { get; set; }
+
+        [CommandOption("--start-day")]
+        [Description("Start day for daily report (optional)")]
+        public int? StartDay { get; set; }
+
+        [CommandOption("--end-day")]
+        [Description("End day for daily report (optional)")]
+        public int? EndDay { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        try
         {
-            AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
-            return;
+            var dataService = new SolarDataService(settings.DataFile);
+            var data = await dataService.LoadDataAsync();
+
+            if (data == null)
+            {
+                AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
+                return 1;
+            }
+
+            AnsiConsole.Clear();
+
+            if (settings.Verbose)
+            {
+                AnsiConsole.MarkupLine("[dim]Verbose mode enabled[/]");
+                AnsiConsole.MarkupLine($"[dim]Data file: {settings.DataFile}[/]");
+                AnsiConsole.WriteLine();
+            }
+
+            // Display header
+            var headerRule = new Rule($"[bold yellow]📊 Solar System Report - {settings.Period.ToUpper()} 📊[/]")
+            {
+                Style = Style.Parse("yellow"),
+                Justification = Justify.Center
+            };
+            AnsiConsole.Write(headerRule);
+
+            switch (settings.Period.ToLower())
+            {
+                case "daily":
+                    await DisplayDailyReport(data, settings);
+                    break;
+                case "weekly":
+                    await DisplayWeeklyReport(data, settings);
+                    break;
+                case "monthly":
+                    await DisplayMonthlyReport(data, settings);
+                    break;
+                case "yearly":
+                    await DisplayYearlyReport(data, settings);
+                    break;
+                default:
+                    AnsiConsole.MarkupLine("[red]Invalid period. Use: daily, weekly, monthly, or yearly[/]");
+                    break;
+            }
+            return 0;
         }
-
-        AnsiConsole.Clear();
-        
-        // Display header
-        var headerRule = new Rule($"[bold yellow]📊 Solar System Report - {options.Period.ToUpper()} 📊[/]")
+        catch (Exception ex)
         {
-            Style = Style.Parse("yellow"),
-            Justification = Justify.Center
-        };
-        AnsiConsole.Write(headerRule);
-
-        switch (options.Period.ToLower())
-        {
-            case "daily":
-                await DisplayDailyReport(data, options);
-                break;
-            case "weekly":
-                await DisplayWeeklyReport(data, options);
-                break;
-            case "monthly":
-                await DisplayMonthlyReport(data, options);
-                break;
-            case "yearly":
-                await DisplayYearlyReport(data, options);
-                break;
-            default:
-                AnsiConsole.MarkupLine("[red]Invalid period. Use: daily, weekly, monthly, or yearly[/]");
-                break;
+            AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+            return 1;
         }
     }
 
-    private async Task DisplayDailyReport(SolarData data, ReportOptions options)
+    private async Task DisplayDailyReport(SolarData data, Settings options)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold cyan]Daily Production Report[/]");
@@ -143,7 +181,7 @@ public class ReportCommand
         }
     }
 
-    private async Task DisplayWeeklyReport(SolarData data, ReportOptions options)
+    private async Task DisplayWeeklyReport(SolarData data, Settings options)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold cyan]Weekly Aggregated Report[/]");
@@ -228,7 +266,7 @@ public class ReportCommand
         AnsiConsole.MarkupLine($"[bold red]⚠️ Worst Week: Week {worstWeek.Week}[/] - {worstWeek.TotalProduction:F2} kWh");
     }
 
-    private async Task DisplayMonthlyReport(SolarData data, ReportOptions options)
+    private async Task DisplayMonthlyReport(SolarData data, Settings options)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold cyan]Monthly Aggregated Report[/]");
@@ -315,7 +353,7 @@ public class ReportCommand
         AnsiConsole.MarkupLine($"[bold red]⚠️ Worst Month: {worstMonthLabel}[/] - {worstMonth.Value.TotalProduction:F2} kWh");
     }
 
-    private async Task DisplayYearlyReport(SolarData data, ReportOptions options)
+    private async Task DisplayYearlyReport(SolarData data, Settings options)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold cyan]Yearly Overview Report[/]");

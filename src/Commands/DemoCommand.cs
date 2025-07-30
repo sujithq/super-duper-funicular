@@ -1,28 +1,41 @@
 using Spectre.Console;
+using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using System.ComponentModel;
 
 namespace SolarScope.Commands;
 
 /// <summary>
-/// Demo command with fun animations and themes
+/// Demo command with fun animations and themes (Spectre.Console.Cli)
 /// </summary>
-public class DemoCommand
+public class DemoCommand : AsyncCommand<DemoCommand.Settings>
 {
-    public async Task ExecuteAsync(DemoOptions options)
+    public class Settings : BaseCommandSettings
     {
-        var dataService = new SolarDataService(options.DataFile);
+        [CommandOption("--theme <THEME>")]
+        [Description("Demo theme: solar, matrix, rainbow")]
+        public string Theme { get; set; } = "solar";
+
+        [CommandOption("--speed <SPEED>")]
+        [Description("Animation speed: slow, normal, fast")]
+        public string Speed { get; set; } = "normal";
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        var dataService = new SolarDataService(settings.DataFile);
         var data = await dataService.LoadDataAsync();
-        
+
         if (data == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
-            return;
+            return 1;
         }
 
-        var speed = GetAnimationSpeed(options.Speed);
-        
-        switch (options.Theme.ToLower())
+        var speed = GetAnimationSpeed(settings.Speed);
+
+        switch (settings.Theme.ToLower())
         {
             case "solar":
                 await SolarThemeDemo(data, speed);
@@ -37,6 +50,7 @@ public class DemoCommand
                 await SolarThemeDemo(data, speed);
                 break;
         }
+        return 0;
     }
 
     private async Task SolarThemeDemo(SolarData data, int speed)

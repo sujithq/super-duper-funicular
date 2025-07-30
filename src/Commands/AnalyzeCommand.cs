@@ -1,35 +1,58 @@
+
 using Spectre.Console;
+using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SolarScope.Commands;
 
 /// <summary>
-/// Analysis command implementation
+/// Analysis command implementation (Spectre.Console.Cli)
 /// </summary>
-public class AnalyzeCommand
+public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
 {
-    public async Task ExecuteAsync(AnalyzeOptions options)
+    public class Settings : BaseCommandSettings
     {
-        var dataService = new SolarDataService(options.DataFile);
+        [CommandOption("--type|-t")]
+        [Description("Type of analysis: production, weather, anomalies, correlation")]
+        public string AnalysisType { get; set; } = "production";
+
+        [CommandOption("--count|-c")]
+        [Description("Number of days/records to analyze")]
+        [DefaultValue(10)]
+        public int Count { get; set; } = 10;
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        var dataService = new SolarDataService(settings.DataFile);
         var data = await dataService.LoadDataAsync();
 
         if (data == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
-            return;
+            return 1;
         }
 
         await AnsiConsole.Status()
             .Spinner(Spinner.Known.Clock)
-            .StartAsync($"Analyzing {options.AnalysisType} data...", async ctx =>
+            .StartAsync($"Analyzing {settings.AnalysisType} data...", async ctx =>
             {
                 await Task.Delay(800); // Dramatic effect
             });
 
         AnsiConsole.Clear();
 
-        var rule = new Rule($"[bold cyan]📊 {options.AnalysisType.ToUpper()} ANALYSIS 📊[/]")
+        if (settings.Verbose)
+        {
+            AnsiConsole.MarkupLine("[dim]Verbose mode enabled[/]");
+            AnsiConsole.MarkupLine($"[dim]Data file: {settings.DataFile}[/]");
+            AnsiConsole.WriteLine();
+        }
+
+        var rule = new Rule($"[bold cyan]📊 {settings.AnalysisType.ToUpper()} ANALYSIS 📊[/]")
         {
             Style = Style.Parse("cyan"),
             Justification = Justify.Center
@@ -37,28 +60,29 @@ public class AnalyzeCommand
         AnsiConsole.Write(rule);
         AnsiConsole.WriteLine();
 
-        switch (options.AnalysisType.ToLower())
+        switch (settings.AnalysisType.ToLower())
         {
             case "production":
-                await AnalyzeProduction(dataService, data, options);
+                await AnalyzeProduction(dataService, data, settings);
                 break;
             case "weather":
-                await AnalyzeWeather(dataService, data, options);
+                await AnalyzeWeather(dataService, data, settings);
                 break;
             case "anomalies":
-                await AnalyzeAnomalies(dataService, data, options);
+                await AnalyzeAnomalies(dataService, data, settings);
                 break;
             case "correlation":
-                await AnalyzeCorrelation(dataService, data, options);
+                await AnalyzeCorrelation(dataService, data, settings);
                 break;
             default:
-                AnsiConsole.MarkupLine($"[red]Unknown analysis type: {options.AnalysisType}[/]");
+                AnsiConsole.MarkupLine($"[red]Unknown analysis type: {settings.AnalysisType}[/]");
                 AnsiConsole.MarkupLine("[yellow]Available types: production, weather, anomalies, correlation[/]");
-                break;
+                return 1;
         }
+        return 0;
     }
 
-    private async Task AnalyzeProduction(SolarDataService dataService, SolarData data, AnalyzeOptions options)
+    private async Task AnalyzeProduction(SolarDataService dataService, SolarData data, Settings options)
     {
         await Task.Run(() =>
         {
@@ -130,7 +154,7 @@ public class AnalyzeCommand
 
     }
 
-    private async Task AnalyzeWeather(SolarDataService dataService, SolarData data, AnalyzeOptions options)
+    private async Task AnalyzeWeather(SolarDataService dataService, SolarData data, Settings options)
     {
         await Task.Run(() =>
         {
@@ -212,7 +236,7 @@ public class AnalyzeCommand
 
     }
 
-    private async Task AnalyzeAnomalies(SolarDataService dataService, SolarData data, AnalyzeOptions options)
+    private async Task AnalyzeAnomalies(SolarDataService dataService, SolarData data, Settings options)
     {
         await Task.Run(() =>
         {
@@ -299,7 +323,7 @@ public class AnalyzeCommand
 
     }
 
-    private async Task AnalyzeCorrelation(SolarDataService dataService, SolarData data, AnalyzeOptions options)
+    private async Task AnalyzeCorrelation(SolarDataService dataService, SolarData data, Settings options)
     {
         await Task.Run(() =>
         {

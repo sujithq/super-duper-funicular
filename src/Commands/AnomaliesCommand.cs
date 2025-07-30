@@ -1,27 +1,52 @@
 using Spectre.Console;
+using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using System.ComponentModel;
 
 namespace SolarScope.Commands;
 
 /// <summary>
-/// Anomalies command implementation
+/// Anomalies command implementation (Spectre.Console.Cli)
 /// </summary>
-public class AnomaliesCommand
+public class AnomaliesCommand : AsyncCommand<AnomaliesCommand.Settings>
 {
-    public async Task ExecuteAsync(AnomaliesOptions options)
+    public class Settings : BaseCommandSettings
     {
-        var dataService = new SolarDataService(options.DataFile);
+        [CommandOption("--year|-y")]
+        [Description("Year to analyze (default: latest year in data)")]
+        public int? Year { get; set; }
+
+        [CommandOption("--severity|-s")]
+        [Description("Minimum anomaly severity (Low, Medium, High)")]
+        public string Severity { get; set; } = "Low";
+
+        [CommandOption("--interactive|-i")]
+        [Description("Run in interactive mode")]
+        [DefaultValue(false)]
+        public bool Interactive { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        var dataService = new SolarDataService(settings.DataFile);
         var data = await dataService.LoadDataAsync();
-        
+
         if (data == null)
         {
             AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
-            return;
+            return 1;
         }
 
         AnsiConsole.Clear();
-        
+
+        if (settings.Verbose)
+        {
+            AnsiConsole.MarkupLine("[dim]Verbose mode enabled[/]");
+            AnsiConsole.MarkupLine($"[dim]Data file: {settings.DataFile}[/]");
+            AnsiConsole.WriteLine();
+        }
+
         // Display header
         var headerRule = new Rule("[bold red]⚠️ Anomaly Detection Analysis ⚠️[/]")
         {
@@ -30,17 +55,18 @@ public class AnomaliesCommand
         };
         AnsiConsole.Write(headerRule);
 
-        if (options.Interactive)
+        if (settings.Interactive)
         {
-            await RunInteractiveMode(data, dataService, options);
+            await RunInteractiveMode(data, dataService, settings);
         }
         else
         {
-            await DisplayAnomalyReport(data, dataService, options);
+            await DisplayAnomalyReport(data, dataService, settings);
         }
+        return 0;
     }
 
-    private async Task DisplayAnomalyReport(SolarData data, SolarDataService dataService, AnomaliesOptions options)
+    private async Task DisplayAnomalyReport(SolarData data, SolarDataService dataService, Settings options)
     {
         var selectedYear = options.Year ?? data.LatestYear;
         var minSeverity = Enum.Parse<AnomalySeverity>(options.Severity, true);
@@ -175,7 +201,7 @@ public class AnomaliesCommand
         AnsiConsole.Write(insightsPanel);
     }
 
-    private async Task RunInteractiveMode(SolarData data, SolarDataService dataService, AnomaliesOptions options)
+    private async Task RunInteractiveMode(SolarData data, SolarDataService dataService, Settings options)
     {
         var selectedYear = options.Year ?? data.LatestYear;
         var minSeverity = Enum.Parse<AnomalySeverity>(options.Severity, true);

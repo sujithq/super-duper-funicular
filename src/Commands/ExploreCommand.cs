@@ -1,53 +1,84 @@
 using Spectre.Console;
+using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using System.ComponentModel;
 
 namespace SolarScope.Commands;
 
 /// <summary>
-/// Explore command implementation
+/// Explore command implementation (Spectre.Console.Cli)
 /// </summary>
-public class ExploreCommand
+public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
 {
-    public async Task ExecuteAsync(ExploreOptions options)
+    public class Settings : BaseCommandSettings
     {
-        var dataService = new SolarDataService(options.DataFile);
-        var data = await dataService.LoadDataAsync();
-        
-        if (data == null)
+        [CommandOption("--mode")]
+        [Description("Exploration mode: quick, guided, or full")]
+        [DefaultValue("quick")]
+        public string Mode { get; set; } = "quick";
+
+        [CommandOption("--year")]
+        [Description("Year to explore (optional)")]
+        public int? Year { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        try
         {
-            AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
-            return;
+            var dataService = new SolarDataService(settings.DataFile);
+            var data = await dataService.LoadDataAsync();
+
+            if (data == null)
+            {
+                AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
+                return 1;
+            }
+
+            AnsiConsole.Clear();
+
+            if (settings.Verbose)
+            {
+                AnsiConsole.MarkupLine("[dim]Verbose mode enabled[/]");
+                AnsiConsole.MarkupLine($"[dim]Data file: {settings.DataFile}[/]");
+                AnsiConsole.WriteLine();
+            }
+
+
+            // Display header
+            var headerRule = new Rule("[bold magenta]🔍 Interactive Solar Data Explorer 🔍[/]")
+            {
+                Style = Style.Parse("magenta"),
+                Justification = Justify.Center
+            };
+            AnsiConsole.Write(headerRule);
+
+            switch (settings.Mode.ToLower())
+            {
+                case "quick":
+                    await QuickExploreMode(data, dataService, settings);
+                    break;
+                case "guided":
+                    await GuidedExploreMode(data, dataService, settings);
+                    break;
+                case "full":
+                    await FullExploreMode(data, dataService, settings);
+                    break;
+                default:
+                    AnsiConsole.MarkupLine("[red]Invalid mode. Use: quick, guided, or full[/]");
+                    break;
+            }
+            return 0;
         }
-
-        AnsiConsole.Clear();
-        
-        // Display header
-        var headerRule = new Rule("[bold magenta]🔍 Interactive Solar Data Explorer 🔍[/]")
+        catch (Exception ex)
         {
-            Style = Style.Parse("magenta"),
-            Justification = Justify.Center
-        };
-        AnsiConsole.Write(headerRule);
-
-        switch (options.Mode.ToLower())
-        {
-            case "quick":
-                await QuickExploreMode(data, dataService, options);
-                break;
-            case "guided":
-                await GuidedExploreMode(data, dataService, options);
-                break;
-            case "full":
-                await FullExploreMode(data, dataService, options);
-                break;
-            default:
-                AnsiConsole.MarkupLine("[red]Invalid mode. Use: quick, guided, or full[/]");
-                break;
+            AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+            return 1;
         }
     }
 
-    private async Task QuickExploreMode(SolarData data, SolarDataService dataService, ExploreOptions options)
+    private async Task QuickExploreMode(SolarData data, SolarDataService dataService, Settings options)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold cyan]⚡ Quick Exploration Mode[/]");
@@ -145,7 +176,7 @@ public class ExploreCommand
         AnsiConsole.Write(anomalyPanel);
     }
 
-    private async Task GuidedExploreMode(SolarData data, SolarDataService dataService, ExploreOptions options)
+    private async Task GuidedExploreMode(SolarData data, SolarDataService dataService, Settings options)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold cyan]🎯 Guided Exploration Mode[/]");
@@ -225,7 +256,7 @@ public class ExploreCommand
         }
     }
 
-    private async Task FullExploreMode(SolarData data, SolarDataService dataService, ExploreOptions options)
+    private async Task FullExploreMode(SolarData data, SolarDataService dataService, Settings options)
     {
         AnsiConsole.WriteLine();
         AnsiConsole.MarkupLine("[bold cyan]🚀 Full Interactive Explorer[/]");

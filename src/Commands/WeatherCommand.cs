@@ -1,56 +1,86 @@
 using Spectre.Console;
+using Spectre.Console.Cli;
 using SolarScope.Models;
 using SolarScope.Services;
+using System.ComponentModel;
 
 namespace SolarScope.Commands;
 
 /// <summary>
-/// Weather command implementation
+/// Weather command implementation (Spectre.Console.Cli)
 /// </summary>
-public class WeatherCommand
+public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
 {
-    public async Task ExecuteAsync(WeatherOptions options)
+    public class Settings : BaseCommandSettings
     {
-        var dataService = new SolarDataService(options.DataFile);
-        var data = await dataService.LoadDataAsync();
-        
-        if (data == null)
+        [CommandOption("--analysis")]
+        [Description("Analysis type: overview, correlation, patterns, or recommendations")]
+        [DefaultValue("overview")]
+        public string Analysis { get; set; } = "overview";
+
+        [CommandOption("--year")]
+        [Description("Year to analyze (optional)")]
+        public int? Year { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        try
         {
-            AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
-            return;
+            var dataService = new SolarDataService(settings.DataFile);
+            var data = await dataService.LoadDataAsync();
+
+            if (data == null)
+            {
+                AnsiConsole.MarkupLine("[red]Failed to load solar data![/]");
+                return 1;
+            }
+
+            AnsiConsole.Clear();
+
+            if (settings.Verbose)
+            {
+                AnsiConsole.MarkupLine("[dim]Verbose mode enabled[/]");
+                AnsiConsole.MarkupLine($"[dim]Data file: {settings.DataFile}[/]");
+                AnsiConsole.WriteLine();
+            }
+
+            // Display header
+            var headerRule = new Rule("[bold blue]🌦️ Weather Analysis & Solar Production Correlation 🌦️[/]")
+            {
+                Style = Style.Parse("blue"),
+                Justification = Justify.Center
+            };
+            AnsiConsole.Write(headerRule);
+
+            switch (settings.Analysis.ToLower())
+            {
+                case "overview":
+                    await DisplayWeatherOverview(data, dataService, settings);
+                    break;
+                case "correlation":
+                    await DisplayCorrelationAnalysis(data, dataService, settings);
+                    break;
+                case "patterns":
+                    await DisplayWeatherPatterns(data, settings);
+                    break;
+                case "recommendations":
+                    await DisplayRecommendations(data, dataService, settings);
+                    break;
+                default:
+                    AnsiConsole.MarkupLine("[red]Invalid analysis type. Use: overview, correlation, patterns, or recommendations[/]");
+                    break;
+            }
+            return 0;
         }
-
-        AnsiConsole.Clear();
-        
-        // Display header
-        var headerRule = new Rule("[bold blue]🌦️ Weather Analysis & Solar Production Correlation 🌦️[/]")
+        catch (Exception ex)
         {
-            Style = Style.Parse("blue"),
-            Justification = Justify.Center
-        };
-        AnsiConsole.Write(headerRule);
-
-        switch (options.Analysis.ToLower())
-        {
-            case "overview":
-                await DisplayWeatherOverview(data, dataService, options);
-                break;
-            case "correlation":
-                await DisplayCorrelationAnalysis(data, dataService, options);
-                break;
-            case "patterns":
-                await DisplayWeatherPatterns(data, options);
-                break;
-            case "recommendations":
-                await DisplayRecommendations(data, dataService, options);
-                break;
-            default:
-                AnsiConsole.MarkupLine("[red]Invalid analysis type. Use: overview, correlation, patterns, or recommendations[/]");
-                break;
+            AnsiConsole.MarkupLine($"[red]Error: {ex.Message}[/]");
+            return 1;
         }
     }
 
-    private async Task DisplayWeatherOverview(SolarData data, SolarDataService dataService, WeatherOptions options)
+    private async Task DisplayWeatherOverview(SolarData data, SolarDataService dataService, Settings options)
     {
         var selectedYear = options.Year ?? data.AvailableYears.FirstOrDefault();
         
@@ -173,7 +203,7 @@ public class WeatherCommand
         AnsiConsole.Write(extremesPanel);
     }
 
-    private async Task DisplayCorrelationAnalysis(SolarData data, SolarDataService dataService, WeatherOptions options)
+    private async Task DisplayCorrelationAnalysis(SolarData data, SolarDataService dataService, Settings options)
     {
         var selectedYear = options.Year ?? data.AvailableYears.FirstOrDefault();
         
@@ -310,7 +340,7 @@ public class WeatherCommand
             return "Weather patterns show complex interactions with solar production";
     }
 
-    private async Task DisplayWeatherPatterns(SolarData data, WeatherOptions options)
+    private async Task DisplayWeatherPatterns(SolarData data, Settings options)
     {
         var selectedYear = options.Year ?? data.AvailableYears.FirstOrDefault();
         
@@ -442,7 +472,7 @@ public class WeatherCommand
         AnsiConsole.Write(seasonalTable);
     }
 
-    private async Task DisplayRecommendations(SolarData data, SolarDataService dataService, WeatherOptions options)
+    private async Task DisplayRecommendations(SolarData data, SolarDataService dataService, Settings options)
     {
         var selectedYear = options.Year ?? data.AvailableYears.FirstOrDefault();
         var correlation = dataService.AnalyzeWeatherCorrelation(data, selectedYear);
