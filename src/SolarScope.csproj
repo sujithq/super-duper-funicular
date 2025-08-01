@@ -5,29 +5,21 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UseTopLevelProgram>false</UseTopLevelProgram>
-    <AssemblyName>SolarScope</AssemblyName>
-    <RootNamespace>SolarScope</RootNamespace>
-    <PackageId>SolarScope</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>Sujith Quintelier</Authors>
-    <Description>SolarScope CLI - Your Personal Solar System Command Center</Description>
-    <PackageTags>solar;cli;weather;analytics;terminal</PackageTags>
+    
+    <!-- .NET Tool Configuration -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>solarscope</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Spectre.Console" Version="0.50.0" />
     <PackageReference Include="Spectre.Console.Cli" Version="0.50.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.7" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="data\**" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="data\**" Pack="true" PackagePath="data\" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
