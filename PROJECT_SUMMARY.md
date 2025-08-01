@@ -7,6 +7,11 @@
 
 ---
 
+> **Looking for live demo GIFs and visual examples?**
+> See the [README.md](./README.md#-live-demo-gifs) for a comprehensive gallery of SolarScope CLI in action, including animated dashboards, analysis, and more!
+
+---
+
 ## 🎯 Project Overview
 
 **SolarScope CLI** is a beautiful, interactive command-line tool for monitoring and analyzing solar energy systems with weather correlations and anomaly detection. Built specifically for GitHub's "For the Love of Code 2025" hackathon in the "Terminal talent" category.
