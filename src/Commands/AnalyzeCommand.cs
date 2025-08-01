@@ -139,14 +139,14 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
             {
                 var balance = day.EnergyBalance;
                 var balanceColor = balance >= 0 ? "green" : "red";
-                var balanceText = $"[{balanceColor}]{balance:+0.0;-0.0} kWh[/]";
+                var balanceText = $"[{balanceColor}]{balance:+0.00;-0.00} kWh[/]";
 
                 table.AddRow(
                     day.FormattedDate,
-                    $"[green]{day.P:F1}[/]",
-                    $"[blue]{day.U:F1}[/]",
+                    $"[green]{day.P:F2}[/]",
+                    $"[blue]{day.U:F2}[/]",
                     balanceText,
-                    $"[yellow]{day.Efficiency:F1}%[/]",
+                    $"[yellow]{day.Efficiency:F2}%[/]",
                     $"[cyan]{GetWeatherEmoji(day.MS.Condition)}[/]"
                 );
             }
@@ -224,10 +224,10 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
 
                 table.AddRow(
                     day.FormattedDate,
-                    $"{day.MS.SunshineHours:F1}",
-                    $"{day.MS.Precipitation:F1}",
-                    $"{day.MS.AverageTemp:F1}",
-                    $"{day.MS.WindSpeed:F1}",
+                    $"{day.MS.SunshineHours:F2}",
+                    $"{day.MS.Precipitation:F2}",
+                    $"{day.MS.AverageTemp:F2}",
+                    $"{day.MS.WindSpeed:F2}",
                     productionImpact
                 );
             }
@@ -393,7 +393,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
 
                 table.AddRow(
                     kvp.Key,
-                    $"{kvp.Value.ToString("F3", System.Globalization.CultureInfo.InvariantCulture)}",
+                    $"{kvp.Value.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}",
                     strength,
                     impact
                 );
@@ -424,7 +424,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         var stats = new Panel(new Markup(
             $"[green]📈 Average Production: {avgProduction:F2} kWh[/]\n" +
             $"[yellow]🎯 Peak Production: {maxProduction:F2} kWh[/]\n" +
-            $"[cyan]⚡ Average Efficiency: {avgEfficiency:F1}%[/]\n" +
+            $"[cyan]⚡ Average Efficiency: {avgEfficiency:F2}%[/]\n" +
             $"[blue]📊 Days Analyzed: {days.Count}[/]"))
         {
             Header = new PanelHeader("[bold]Production Statistics[/]"),
@@ -447,10 +447,10 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         var sunnyDays = latestYearData.Count(d => d.MS.Condition == WeatherCondition.Sunny);
 
         var stats = new Panel(new Markup(
-            $"[yellow]🌡 Average Temperature: {avgTemp:F1}°C[/]\n" +
-            $"[blue]🌧 Total Precipitation: {totalPrecip:F1}mm[/]\n" +
-            $"[orange1]☀ Total Sunshine: {totalSunshine:F1} hours[/]\n" +
-            $"[green]🌞 Sunny Days: {sunnyDays} ({(double)sunnyDays / latestYearData.Count * 100:F1}%)[/]"))
+            $"[yellow]🌡 Average Temperature: {avgTemp:F2}°C[/]\n" +
+            $"[blue]🌧 Total Precipitation: {totalPrecip:F2}mm[/]\n" +
+            $"[orange1]☀ Total Sunshine: {totalSunshine:F2} hours[/]\n" +
+            $"[green]🌞 Sunny Days: {sunnyDays} ({(double)sunnyDays / latestYearData.Count * 100:F2}%)[/]"))
         {
             Header = new PanelHeader("[bold]Weather Statistics[/]"),
             Border = BoxBorder.Rounded,
@@ -512,7 +512,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
 
     private static string GetWeatherSummary(MeteoStatData weather)
     {
-        return $"{weather.Condition} ({weather.SunshineHours:F1}h ☀)";
+        return $"{weather.Condition} ({weather.SunshineHours:F2}h ☀)";
     }
 
     private static string GetPotentialCause(BarChartDataWithYear day)

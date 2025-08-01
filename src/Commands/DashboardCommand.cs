@@ -279,9 +279,9 @@ public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
         weatherTable.AddColumn("[bold]Value[/]");
         weatherTable.AddColumn("[bold]Trend[/]");
 
-        weatherTable.AddRow("Average Temperature", $"{avgTemp:F1}°C", GetTempTrend(avgTemp));
-        weatherTable.AddRow("Total Precipitation", $"{totalPrecip:F1}mm", GetPrecipTrend(totalPrecip));
-        weatherTable.AddRow("Average Sunshine", $"{avgSunshine:F1}h", GetSunshineTrend(avgSunshine));
+        weatherTable.AddRow("Average Temperature", $"{avgTemp:F2}°C", GetTempTrend(avgTemp));
+        weatherTable.AddRow("Total Precipitation", $"{totalPrecip:F2}mm", GetPrecipTrend(totalPrecip));
+        weatherTable.AddRow("Average Sunshine", $"{avgSunshine:F2}h", GetSunshineTrend(avgSunshine));
 
         var weatherPanel = new Panel(weatherTable)
         {
@@ -360,10 +360,10 @@ public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
         var efficiency = totalConsumption / totalProduction * 100;
 
         var quickStats = new Panel(new Markup(
-            $"[green]📊 Total Production: {totalProduction:F1} kWh[/]\n" +
-            $"[blue]⚡ Total Consumption: {totalConsumption:F1} kWh[/]\n" +
-            $"[yellow]⚖ Energy Balance: {(balance >= 0 ? "+" : "")}{balance:F1} kWh[/]\n" +
-            $"[cyan]🎯 System Efficiency: {efficiency:F1}%[/]\n\n" +
+            $"[green]📊 Total Production: {totalProduction:F2} kWh[/]\n" +
+            $"[blue]⚡ Total Consumption: {totalConsumption:F2} kWh[/]\n" +
+            $"[yellow]⚖ Energy Balance: {(balance >= 0 ? "+" : "")}{balance:F2} kWh[/]\n" +
+            $"[cyan]🎯 System Efficiency: {efficiency:F2}%[/]\n\n" +
             $"[dim]💡 Use --full for detailed dashboard[/]"))
         {
             Header = new PanelHeader("[bold]Quick Summary[/]"),

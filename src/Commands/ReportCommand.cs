@@ -172,7 +172,7 @@ public class ReportCommand : BaseCommand<ReportCommand.Settings>
             statsTable.AddRow("Average Daily Production", $"{avgDaily:F2} kWh");
             statsTable.AddRow("Max Daily Production", $"{maxDaily:F2} kWh");
             statsTable.AddRow("Min Daily Production", $"{minDaily:F2} kWh");
-            statsTable.AddRow("Energy Efficiency", $"{(totalConsumption / totalProduction * 100):F1}%");
+            statsTable.AddRow("Energy Efficiency", $"{(totalConsumption / totalProduction * 100):F2}%");
 
             AnsiConsole.Write(statsTable);
 
@@ -185,7 +185,7 @@ public class ReportCommand : BaseCommand<ReportCommand.Settings>
             foreach (var day in topDays)
             {
                 AnsiConsole.MarkupLine($"  D {day.D}: [green]{day.P:F2} kWh[/] " +
-                                     $"(Weather: {day.MS.Condition}, {day.MS.SunshineHours:F1}h sun)");
+                                     $"(Weather: {day.MS.Condition}, {day.MS.SunshineHours:F2}h sun)");
             }
 
             AnsiConsole.WriteLine();
@@ -193,7 +193,7 @@ public class ReportCommand : BaseCommand<ReportCommand.Settings>
             foreach (var day in bottomDays)
             {
                 AnsiConsole.MarkupLine($"  D {day.D}: [red]{day.P:F2} kWh[/] " +
-                                     $"(Weather: {day.MS.Condition}, {day.MS.SunshineHours:F1}h sun)");
+                                     $"(Weather: {day.MS.Condition}, {day.MS.SunshineHours:F2}h sun)");
             }
         });
     }
