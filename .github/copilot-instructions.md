@@ -18,6 +18,17 @@ SolarScope CLI is a beautiful, interactive command-line tool for monitoring and 
 - **Build Scripts** - Cross-platform build automation (`build.sh`, `build.bat`)
 - **Demo Scripts** - Feature showcase scripts (`demo.sh`, `demo.bat`)
 
+## Data File Handling
+
+SolarScope CLI automatically manages data files with the following behavior:
+
+1. **Specified file** (via `-d/--data` option): Uses the exact file path provided
+2. **User profile default**: Automatically creates `~/SolarScopeData.json` on first run
+3. **Sample data fallback**: Copies from `data/sample.json` if no user data exists
+4. **Empty file creation**: Creates minimal valid JSON structure if sample data unavailable
+
+This ensures the application works out-of-the-box without requiring manual data setup, while still allowing users to specify custom data files for advanced usage.
+
 ## Technology Stack
 
 - **.NET 9.0** - Modern, cross-platform framework
