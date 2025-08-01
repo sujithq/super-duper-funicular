@@ -99,9 +99,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
     {
         await Task.Run(() =>
         {
-
-
-            var topDays = dataService.GetTopProductionDays(data, options.Count);
+            var topDays = dataService.GetTopProductionDaysWithYear(data, options.Count);
 
             // Production trends chart
             var chart = new BarChart()
@@ -119,7 +117,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                     _ => Color.Orange1
                 };
 
-                chart.AddItem($"Day {day.D}", day.P, color);
+                chart.AddItem(day.FormattedDate, day.P, color);
             }
 
             AnsiConsole.Write(chart);
@@ -130,7 +128,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                 .Border(TableBorder.Rounded)
                 .BorderColor(Color.Green);
 
-            table.AddColumn("[bold]D[/]");
+            table.AddColumn("[bold]Date[/]");
             table.AddColumn("[bold]Production (kWh)[/]");
             table.AddColumn("[bold]Consumption (kWh)[/]");
             table.AddColumn("[bold]Balance[/]");
@@ -144,7 +142,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                 var balanceText = $"[{balanceColor}]{balance:+0.0;-0.0} kWh[/]";
 
                 table.AddRow(
-                    $"Day {day.D}",
+                    day.FormattedDate,
                     $"[green]{day.P:F1}[/]",
                     $"[blue]{day.U:F1}[/]",
                     balanceText,
@@ -171,8 +169,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
     {
         await Task.Run(() =>
         {
-            var latestYear = data.LatestYear;
-            var worstWeatherDays = dataService.GetWorstWeatherDays(data, latestYear, options.Count);
+            var worstWeatherDays = dataService.GetWorstWeatherDaysWithYear(data, options.Count);
 
             // Weather conditions breakdown
             var weatherBreakdown = new BreakdownChart()
@@ -213,7 +210,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                 .Border(TableBorder.Rounded)
                 .BorderColor(Color.Blue);
 
-            table.AddColumn("[bold]Day[/]");
+            table.AddColumn("[bold]Date[/]");
             table.AddColumn("[bold]Sunshine (h)[/]");
             table.AddColumn("[bold]Precipitation (mm)[/]");
             table.AddColumn("[bold]Temp (°C)[/]");
@@ -226,7 +223,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                                      day.P < 10 ? "[yellow]Medium Impact[/]" : "[green]Low Impact[/]";
 
                 table.AddRow(
-                    $"Day {day.D}",
+                    day.FormattedDate,
                     $"{day.MS.SunshineHours:F1}",
                     $"{day.MS.Precipitation:F1}",
                     $"{day.MS.AverageTemp:F1}",
@@ -253,7 +250,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
     {
         await Task.Run(() =>
         {
-            var anomalousData = dataService.GetAnomalousData(data, AnomalySeverity.Low);
+            var anomalousData = dataService.GetAnomalousDataWithYear(data, AnomalySeverity.Low);
 
             if (anomalousData.Count == 0)
             {
@@ -295,7 +292,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                 .Border(TableBorder.Rounded)
                 .BorderColor(Color.Red);
 
-            table.AddColumn("[bold]D[/]");
+            table.AddColumn("[bold]Date[/]");
             table.AddColumn("[bold]Severity[/]");
             table.AddColumn("[bold]Production Anomaly[/]");
             table.AddColumn("[bold]Consumption Anomaly[/]");
@@ -313,7 +310,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                 };
 
                 table.AddRow(
-                    $"Day {day.D}",
+                    day.FormattedDate,
                     $"[{severityColor}]{day.AS.Severity}[/]",
                     $"{day.AS.ProductionAnomaly:F2}",
                     $"{day.AS.ConsumptionAnomaly:F2}",
@@ -416,7 +413,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
 
     }
 
-    private void DisplayProductionStatistics(List<BarChartData> days)
+    private void DisplayProductionStatistics(List<BarChartDataWithYear> days)
     {
         AnsiConsole.WriteLine();
 
@@ -463,7 +460,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         AnsiConsole.Write(stats);
     }
 
-    private void DisplayAnomalyRecommendations(List<BarChartData> anomalies)
+    private void DisplayAnomalyRecommendations(List<BarChartDataWithYear> anomalies)
     {
         AnsiConsole.WriteLine();
 
@@ -518,7 +515,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         return $"{weather.Condition} ({weather.SunshineHours:F1}h ☀)";
     }
 
-    private static string GetPotentialCause(BarChartData day)
+    private static string GetPotentialCause(BarChartDataWithYear day)
     {
         if (day.MS.Precipitation > 5) return "Heavy rain";
         if (day.MS.SunshineHours < 2) return "Low sunshine";

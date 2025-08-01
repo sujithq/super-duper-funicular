@@ -9,7 +9,7 @@ namespace SolarScope.Commands;
 /// <summary>
 /// Dashboard command implementation (Spectre.Console.Cli)
 /// </summary>
-public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
+public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
 {
     public class Settings : BaseCommandSettings
     {

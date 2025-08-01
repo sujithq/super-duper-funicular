@@ -9,7 +9,7 @@ namespace SolarScope.Commands;
 /// <summary>
 /// Report command implementation (Spectre.Console.Cli)
 /// </summary>
-public class ReportCommand : AsyncCommand<ReportCommand.Settings>
+public class ReportCommand : BaseCommand<ReportCommand.Settings>
 {
     public class Settings : BaseCommandSettings
     {

@@ -47,6 +47,98 @@ public record BarChartData(
 };
 
 /// <summary>
+/// Represents a daily solar system and weather data entry with year information
+/// </summary>
+public record BarChartDataWithYear(int Year, BarChartData Data)
+{
+    /// <summary>
+    /// Day of year from the underlying data
+    /// </summary>
+    public int D => Data.D;
+    
+    /// <summary>
+    /// Production from the underlying data
+    /// </summary>
+    public double P => Data.P;
+    
+    /// <summary>
+    /// Consumption from the underlying data
+    /// </summary>
+    public double U => Data.U;
+    
+    /// <summary>
+    /// Injection from the underlying data
+    /// </summary>
+    public double I => Data.I;
+    
+    /// <summary>
+    /// Meteo data from the underlying data
+    /// </summary>
+    public MeteoStatData MS => Data.MS;
+    
+    /// <summary>
+    /// Anomaly data from the underlying data
+    /// </summary>
+    public AnomalyData AS => Data.AS;
+    
+    /// <summary>
+    /// Quarter data from the underlying data
+    /// </summary>
+    public QuarterData Q => Data.Q;
+    
+    /// <summary>
+    /// Sun rise/set data from the underlying data
+    /// </summary>
+    public SunRiseSet SRS => Data.SRS;
+    
+    /// <summary>
+    /// Calculated properties from the underlying data
+    /// </summary>
+    public double Efficiency => Data.Efficiency;
+    public double EnergyBalance => Data.EnergyBalance;
+    public bool IsEnergyPositive => Data.IsEnergyPositive;
+    public double PeakProduction => Data.PeakProduction;
+    public double AverageProduction => Data.AverageProduction;
+    
+    /// <summary>
+    /// Converts the day-of-year number to a user-friendly date string using the correct year
+    /// </summary>
+    public string FormattedDate
+    {
+        get
+        {
+            try
+            {
+                var date = new DateTime(Year, 1, 1).AddDays(D - 1);
+                return date.ToString("MMM d, yyyy", System.Globalization.CultureInfo.CurrentCulture);
+            }
+            catch
+            {
+                return $"Day {D}";
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Gets the actual DateTime for this entry
+    /// </summary>
+    public DateTime Date
+    {
+        get
+        {
+            try
+            {
+                return new DateTime(Year, 1, 1).AddDays(D - 1);
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
+        }
+    }
+};
+
+/// <summary>
 /// Represents anomaly detection data
 /// </summary>
 public record AnomalyData(
@@ -287,4 +379,32 @@ public class SolarData : Dictionary<int, List<BarChartData>>
     /// Gets available years as a list
     /// </summary>
     public List<int> AvailableYears => this.Keys.OrderBy(y => y).ToList();
+    
+    /// <summary>
+    /// Gets all data across all years with year information included
+    /// </summary>
+    public List<BarChartDataWithYear> GetAllDataWithYear()
+    {
+        return this.SelectMany(kvp => kvp.Value.Select(data => new BarChartDataWithYear(kvp.Key, data)))
+                   .ToList();
+    }
+    
+    /// <summary>
+    /// Gets data for a specific year with year information included
+    /// </summary>
+    public List<BarChartDataWithYear> GetYearDataWithYear(int year)
+    {
+        if (!this.ContainsKey(year))
+            return new List<BarChartDataWithYear>();
+            
+        return this[year].Select(data => new BarChartDataWithYear(year, data)).ToList();
+    }
+    
+    /// <summary>
+    /// Gets data for the latest year with year information included
+    /// </summary>
+    public List<BarChartDataWithYear> GetLatestYearDataWithYear()
+    {
+        return GetYearDataWithYear(LatestYear);
+    }
 }

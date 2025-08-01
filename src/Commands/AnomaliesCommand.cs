@@ -9,7 +9,7 @@ namespace SolarScope.Commands;
 /// <summary>
 /// Anomalies command implementation (Spectre.Console.Cli)
 /// </summary>
-public class AnomaliesCommand : AsyncCommand<AnomaliesCommand.Settings>
+public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
 {
     public class Settings : BaseCommandSettings
     {
@@ -130,7 +130,7 @@ public class AnomaliesCommand : AsyncCommand<AnomaliesCommand.Settings>
             var anomaliesTable = new Table()
                 .Border(TableBorder.Rounded)
                 .Title($"[bold]Top {Math.Min(20, anomalies.Count)} Anomalies - Year {selectedYear}[/]")
-                .AddColumn("[yellow]D[/]")
+                .AddColumn("[yellow]Date[/]")
                 .AddColumn("[red]Severity[/]")
                 .AddColumn("[green]Production[/]")
                 .AddColumn("[blue]Consumption[/]")
@@ -149,7 +149,7 @@ public class AnomaliesCommand : AsyncCommand<AnomaliesCommand.Settings>
                 };
 
                 anomaliesTable.AddRow(
-                    anomaly.D.ToString(),
+                    GetDateFromDayOfYear(anomaly.D, selectedYear),
                     $"[{severityColor}]{anomaly.AS.Severity}[/]",
                     $"{anomaly.P:F2} kWh",
                     $"{anomaly.U:F2} kWh",

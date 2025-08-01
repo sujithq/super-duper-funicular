@@ -351,6 +351,40 @@ public class SolarDataService
         
         return denominator == 0 ? 0 : numerator / denominator;
     }
+
+    /// <summary>
+    /// Gets days with the best solar production (across all years) with year information
+    /// </summary>
+    public List<BarChartDataWithYear> GetTopProductionDaysWithYear(SolarData data, int count = 10)
+    {
+        return data.GetAllDataWithYear()
+            .OrderByDescending(d => d.P)
+            .Take(count)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Gets days with the worst weather conditions (across all years) with year information
+    /// </summary>
+    public List<BarChartDataWithYear> GetWorstWeatherDaysWithYear(SolarData data, int count = 10)
+    {
+        return data.GetAllDataWithYear()
+            .OrderBy(d => d.MS.SunshineHours)
+            .ThenByDescending(d => d.MS.Precipitation)
+            .Take(count)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Gets anomaly data above a certain threshold (across all years) with year information
+    /// </summary>
+    public List<BarChartDataWithYear> GetAnomalousDataWithYear(SolarData data, AnomalySeverity minSeverity = AnomalySeverity.Low)
+    {
+        return data.GetAllDataWithYear()
+            .Where(d => d.AS.Severity >= minSeverity)
+            .OrderByDescending(d => d.AS.TotalAnomalyScore)
+            .ToList();
+    }
 }
 
 /// <summary>
