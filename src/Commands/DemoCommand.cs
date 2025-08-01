@@ -11,7 +11,7 @@ namespace SolarScope.Commands;
 /// <summary>
 /// Demo command with fun animations and themes (Spectre.Console.Cli)
 /// </summary>
-public class DemoCommand : AsyncCommand<DemoCommand.Settings>
+public class DemoCommand : BaseCommand<DemoCommand.Settings>
 {
     public class Settings : BaseCommandSettings
     {
