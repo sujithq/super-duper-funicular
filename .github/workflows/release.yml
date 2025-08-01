@@ -11,6 +11,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: write
+
 env:
   DOTNET_VERSION: '9.0.x'
   PROJECT_PATH: 'src/SolarScope.csproj'

@@ -21,6 +21,10 @@ on:
           - minor
           - major
 
+permissions:
+  contents: write
+  pull-requests: write
+
 env:
   DOTNET_VERSION: '9.0.x'
   PROJECT_PATH: 'src/SolarScope.csproj'
