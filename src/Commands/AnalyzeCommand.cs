@@ -1,4 +1,3 @@
-
 using Spectre.Console;
 using Spectre.Console.Cli;
 using SolarScope.Models;
@@ -25,10 +24,24 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         public int Count { get; set; } = 10;
     }
 
+    private static readonly HashSet<string> ValidTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "production", "weather", "anomalies", "correlation"
+    };
+
+    public override ValidationResult Validate(CommandContext context, Settings settings)
+    {
+        if (!ValidTypes.Contains(settings.AnalysisType))
+        {
+            return ValidationResult.Error($"Invalid analysis type: '{settings.AnalysisType}'. Valid types are: production, weather, anomalies, correlation.");
+        }
+        return base.Validate(context, settings);
+    }
+
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var dataService = new SolarDataService(settings.DataFile);
-        var data = await dataService.LoadDataAsync();
+        var data = await dataService.LoadDataAsync(settings.Verbose);
 
         if (data == null)
         {

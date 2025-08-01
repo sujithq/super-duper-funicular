@@ -24,10 +24,32 @@ public class DemoCommand : AsyncCommand<DemoCommand.Settings>
         public string Speed { get; set; } = "normal";
     }
 
+    private static readonly HashSet<string> ValidThemes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "solar", "matrix", "rainbow"
+    };
+    private static readonly HashSet<string> ValidSpeeds = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "slow", "normal", "fast"
+    };
+
+    public override ValidationResult Validate(CommandContext context, Settings settings)
+    {
+        if (!ValidThemes.Contains(settings.Theme))
+        {
+            return ValidationResult.Error($"Invalid theme: '{settings.Theme}'. Valid values are: solar, matrix, rainbow.");
+        }
+        if (!ValidSpeeds.Contains(settings.Speed))
+        {
+            return ValidationResult.Error($"Invalid speed: '{settings.Speed}'. Valid values are: slow, normal, fast.");
+        }
+        return base.Validate(context, settings);
+    }
+
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var dataService = new SolarDataService(settings.DataFile);
-        var data = await dataService.LoadDataAsync();
+        var data = await dataService.LoadDataAsync(settings.Verbose);
 
         if (data == null)
         {

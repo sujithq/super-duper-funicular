@@ -8,9 +8,16 @@ public class BaseCommandSettings : CommandSettings
     /// <summary>
     /// Gets or sets the data file path or URL.
     /// </summary>
+
     [CommandOption("--data|-d")]
     [Description("Path or URL to the solar data JSON file")]
-    public string DataFile { get; set; } = "https://raw.githubusercontent.com/sujithq/myenergy/refs/heads/main/src/myenergy/wwwroot/Data/data.json";
+    public string DataFile { get; set; }
+
+    public BaseCommandSettings()
+    {
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        DataFile = System.IO.Path.Combine(userProfile, "SolarScopeData.json");
+    }
 
 
     /// <summary>
