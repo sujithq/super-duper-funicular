@@ -266,7 +266,26 @@ The tool analyzes your solar system data including:
   dotnet build
   ```
 
-3. **Run the application**
+3. **Data Setup**
+
+  SolarScope CLI automatically handles data file setup:
+  
+- On first run, it creates `SolarScopeData.json` in your user profile directory
+- If available, it copies sample data from the installation
+- You can specify a custom data file with `--data` option
+  
+  ```bash
+  # Use default data location (~/SolarScopeData.json)
+  dotnet run -- dashboard
+  
+  # Use custom data file
+  dotnet run -- dashboard --data ./data/sample.json
+  
+  # Use remote data (URL)
+  dotnet run -- dashboard --data https://example.com/solar-data.json
+  ```
+
+4. **Run the application**
 
   ```bash
   dotnet run -- dashboard
@@ -469,6 +488,28 @@ Day 344  Day 348  Day 352  Day 356  Day 360
 
 ## 🔧 Configuration
 
+### Data File Locations
+
+SolarScope CLI uses the following data file precedence:
+
+1. **Specified file**: `--data /path/to/file.json` (highest priority)
+2. **User profile**: `~/SolarScopeData.json` (default location)
+3. **Sample data**: Automatically created from embedded sample on first run
+
+```bash
+# Default behavior - uses ~/SolarScopeData.json
+solarscope dashboard
+
+# Custom local file
+solarscope dashboard --data /path/to/your/solar-data.json
+
+# Remote URL
+solarscope dashboard --data https://example.com/solar-data.json
+
+# Enable verbose logging to see data loading process
+solarscope analyze --verbose --type production
+```
+
 ### Data Sources
 
 The tool expects JSON data in the following format:
@@ -488,16 +529,6 @@ The tool expects JSON data in the following format:
     }
   ]
 }
-```
-
-### Custom Data Files
-
-```bash
-# Use custom data file
-solarscope dashboard --data /path/to/your/solar-data.json
-
-# Enable verbose logging
-solarscope analyze --verbose --type production
 ```
 
 ## 🤝 Contributing
