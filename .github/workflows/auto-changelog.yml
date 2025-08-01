@@ -1,0 +1,80 @@
+name: Auto-Update Changelog
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'chore: update changelog')"
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install conventional-changelog-cli
+      run: npm install -g conventional-changelog-cli
+
+    - name: Get last release tag
+      id: last_tag
+      run: |
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        if [ -z "$LAST_TAG" ]; then
+          echo "range=HEAD" >> $GITHUB_OUTPUT
+        else
+          echo "range=$LAST_TAG..HEAD" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Generate changelog entries
+      id: changelog_entries
+      run: |
+        # Generate conventional changelog for unreleased changes
+        CHANGELOG_CONTENT=$(conventional-changelog --preset angular --output-unreleased | sed '/^$/d')
+        
+        if [ -n "$CHANGELOG_CONTENT" ]; then
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "changelog_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update unreleased section
+      if: steps.changelog_entries.outputs.has_changes == 'true'
+      run: |
+        # Create temp file with new unreleased content
+        echo "## [Unreleased]" > temp_unreleased.md
+        echo "" >> temp_unreleased.md
+        echo "${{ steps.changelog_entries.outputs.changelog_content }}" >> temp_unreleased.md
+        echo "" >> temp_unreleased.md
+        
+        # Remove old [Unreleased] section and add new one
+        sed -i '/## \[Unreleased\]/,/## \[/{ /## \[Unreleased\]/d; /## \[/!d; }' CHANGELOG.md
+        
+        # Prepend new unreleased section
+        cat temp_unreleased.md CHANGELOG.md > temp_changelog.md
+        mv temp_changelog.md CHANGELOG.md
+        rm temp_unreleased.md
+
+    - name: Commit changelog updates
+      if: steps.changelog_entries.outputs.has_changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add CHANGELOG.md
+        git diff --staged --quiet || git commit -m "chore: update changelog with recent changes"
+        git push origin main

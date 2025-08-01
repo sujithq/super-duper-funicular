@@ -1,0 +1,46 @@
+# <type>[optional scope]: <description>
+# 
+# [optional body]
+#
+# [optional footer(s)]
+#
+# ────────────────────────────────────────────────────────────────
+# 
+# Types:
+#   feat     - A new feature
+#   fix      - A bug fix
+#   docs     - Documentation only changes
+#   style    - Changes that do not affect the meaning of the code
+#   refactor - A code change that neither fixes a bug nor adds a feature
+#   test     - Adding missing tests or correcting existing tests
+#   chore    - Changes to the build process or auxiliary tools
+#   perf     - A code change that improves performance
+#   ci       - Changes to CI configuration files and scripts
+#   build    - Changes that affect the build system or external dependencies
+# 
+# Scopes (optional):
+#   dashboard - Dashboard command and UI
+#   analyze   - Analysis commands and algorithms  
+#   anomalies - Anomaly detection features
+#   weather   - Weather-related functionality
+#   data      - Data loading and processing
+#   models    - Data models and types
+#   services  - Business logic services
+#   cli       - Command-line interface
+#   demo      - Demo and animation features
+#   docs      - Documentation
+#   ci        - Continuous integration
+#   deps      - Dependencies
+#
+# Breaking Changes:
+#   Add ! after type or scope: feat!: or feat(scope)!:
+#   Or add "BREAKING CHANGE:" in footer
+#
+# Examples:
+#   feat(dashboard): add dark mode theme
+#   fix: resolve memory leak in data processing
+#   docs: update API documentation
+#   feat!: redesign command structure (breaking change)
+#   perf(analyze): optimize correlation algorithm by 40%
+#
+# ────────────────────────────────────────────────────────────────

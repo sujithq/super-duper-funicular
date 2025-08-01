@@ -10,6 +10,19 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>solarscope</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>SolarScope</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>Sujith Quintelier</Authors>
+    <PackageDescription>A beautiful, interactive command-line tool for monitoring and analyzing solar energy systems with weather correlations and anomaly detection. Built for GitHub's For the Love of Code 2025 hackathon.</PackageDescription>
+    <PackageProjectUrl>https://github.com/sujithq/super-duper-funicular</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sujithq/super-duper-funicular</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>solar;energy;cli;dotnet-tool;renewable;weather;analytics;terminal;spectre-console;hackathon</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>Initial release: Beautiful CLI for solar energy monitoring with weather correlations, anomaly detection, and interactive dashboards.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +33,11 @@
 
   <ItemGroup>
     <Content Include="data\**" Pack="true" PackagePath="data\" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Include README.md in NuGet package -->
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
