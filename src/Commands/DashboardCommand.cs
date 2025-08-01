@@ -38,7 +38,7 @@ public class DashboardCommand : AsyncCommand<DashboardCommand.Settings>
                 await Task.Delay(500); // Simulated processing for dramatic effect
             });
 
-        var data = await dataService.LoadDataAsync();
+        var data = await dataService.LoadDataAsync(settings.Verbose);
 
         if (data == null)
         {
