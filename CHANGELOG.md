@@ -3,6 +3,7 @@
 #  (2025-08-01)
 ### Bug Fixes
 * add permissions section to GitHub Actions workflows to resolve 403 errors ([881cf74](https://github.com/sujithq/super-duper-funicular/commit/881cf74d0364f2b462d903c1042b44638832ebec))
+* **ci:** resolve git hook line ending issues for WSL compatibility ([08e0ee6](https://github.com/sujithq/super-duper-funicular/commit/08e0ee6ee4d98f3d978bb9b90755d07c62663fe4))
 * Standardize date formatting in GetDateFromDayOfYear method for consistency ([c7ce158](https://github.com/sujithq/super-duper-funicular/commit/c7ce158c8c5e0a941dbdeeb5086417aa496c1e39))
 * Update best production day and recent days display to include formatted dates for clarity ([f5438da](https://github.com/sujithq/super-duper-funicular/commit/f5438dab7d117c019c42dfa6b297cd20b25c2204))
 * Update formatting for numerical outputs in AnalyzeCommand, DashboardCommand, and ReportCommand for consistency ([8e73b04](https://github.com/sujithq/super-duper-funicular/commit/8e73b04ee0e444c611a3d96ca0473fb78cb05e23))
@@ -12,13 +13,6 @@
 * Introduce BaseCommand class and refactor existing commands to inherit from it for improved code reuse and maintainability ([16d6057](https://github.com/sujithq/super-duper-funicular/commit/16d60573a021299a20df74d771ccb9418e5b3708))
 * **setup:** add scripts for configuring Conventional Commits ([e9d25f2](https://github.com/sujithq/super-duper-funicular/commit/e9d25f2f95096841929ac1c8cff356a304409e92))
 * Upgrade project to .NET 9.0 and update dependencies ([66b0c75](https://github.com/sujithq/super-duper-funicular/commit/66b0c7558d841d3612b3105263b5f9aa065509c9))
-
-# Changelog
-
-All notable changes to SolarScope CLI will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.0] - 2025-08-01
 
