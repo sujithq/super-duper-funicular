@@ -1,0 +1,275 @@
+name: Enhanced Release with Conventional Commits
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.1) - leave empty for auto-detection'
+        required: false
+        type: string
+      release_type:
+        description: 'Release type (auto-detected if version not specified)'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  PROJECT_PATH: 'src/SolarScope.csproj'
+  PACKAGE_OUTPUT_PATH: 'src/nupkg'
+
+jobs:
+  detect-version:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.version == ''
+    outputs:
+      version: ${{ steps.auto_version.outputs.version }}
+      release_type: ${{ steps.auto_version.outputs.release_type }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Get current version
+      id: current_version
+      run: |
+        CURRENT_VERSION=$(grep -o '<PackageVersion>.*</PackageVersion>' ${{ env.PROJECT_PATH }} | sed 's/<[^>]*>//g')
+        echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Get latest tag
+      id: latest_tag
+      run: |
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+    - name: Analyze commits for version bump
+      id: auto_version
+      run: |
+        # Get commits since last tag
+        COMMITS=$(git log --pretty=format:"%s" ${{ steps.latest_tag.outputs.tag }}..HEAD)
+        
+        echo "Analyzing commits since ${{ steps.latest_tag.outputs.tag }}:"
+        echo "$COMMITS"
+        
+        # Determine release type based on conventional commits
+        if echo "$COMMITS" | grep -qE "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build).*!:" || echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
+          RELEASE_TYPE="major"
+        elif echo "$COMMITS" | grep -qE "^feat(\([^)]*\))?:"; then
+          RELEASE_TYPE="minor"
+        elif echo "$COMMITS" | grep -qE "^(fix|perf)(\([^)]*\))?:"; then
+          RELEASE_TYPE="patch"
+        elif echo "$COMMITS" | grep -qE "^(docs|style|refactor|test|chore|ci|build)(\([^)]*\))?:"; then
+          RELEASE_TYPE="patch"
+        else
+          RELEASE_TYPE="patch"
+        fi
+        
+        # Calculate new version
+        CURRENT="${{ steps.current_version.outputs.current }}"
+        IFS='.' read -ra VERSION_PARTS <<< "$CURRENT"
+        MAJOR=${VERSION_PARTS[0]}
+        MINOR=${VERSION_PARTS[1]}
+        PATCH=${VERSION_PARTS[2]}
+        
+        case "$RELEASE_TYPE" in
+          "major")
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            ;;
+          "minor")
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            ;;
+          "patch")
+            PATCH=$((PATCH + 1))
+            ;;
+        esac
+        
+        NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+        
+        echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+        echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        
+        echo "Auto-detected version bump: $CURRENT → $NEW_VERSION ($RELEASE_TYPE)"
+
+  generate-changelog:
+    runs-on: ubuntu-latest
+    needs: [detect-version]
+    if: always() && (needs.detect-version.result == 'success' || needs.detect-version.result == 'skipped')
+    outputs:
+      changelog: ${{ steps.generate.outputs.changelog }}
+      version: ${{ steps.version.outputs.version }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install conventional-changelog-cli
+      run: npm install -g conventional-changelog-cli
+
+    - name: Determine version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${{ needs.detect-version.outputs.version }}"
+          fi
+        else
+          VERSION=${GITHUB_REF#refs/tags/v}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Generate conventional changelog
+      id: generate
+      run: |
+        # Generate changelog from conventional commits
+        CHANGELOG_CONTENT=$(conventional-changelog -p angular -u | sed '/^$/d' | head -50)
+        
+        if [ -n "$CHANGELOG_CONTENT" ]; then
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "changelog=No significant changes detected from conventional commits." >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update CHANGELOG.md
+      run: |
+        DATE=$(date +%Y-%m-%d)
+        VERSION="${{ steps.version.outputs.version }}"
+        
+        # Create new version entry
+        echo "## [$VERSION] - $DATE" > temp_changelog.md
+        echo "" >> temp_changelog.md
+        
+        # Add conventional changelog content
+        if [ -n "${{ steps.generate.outputs.changelog }}" ]; then
+          echo "${{ steps.generate.outputs.changelog }}" >> temp_changelog.md
+        else
+          echo "### Changed" >> temp_changelog.md
+          echo "- Version bump to $VERSION" >> temp_changelog.md
+        fi
+        echo "" >> temp_changelog.md
+        
+        # Update existing CHANGELOG.md
+        if [ -f CHANGELOG.md ]; then
+          # Replace [Unreleased] with new version or add after it
+          if grep -q "## \[Unreleased\]" CHANGELOG.md; then
+            sed -i "/## \[Unreleased\]/r temp_changelog.md" CHANGELOG.md
+          else
+            # Add new version at the top after header
+            sed -i "1,/^## / { /^## /r temp_changelog.md
+            }" CHANGELOG.md
+          fi
+        else
+          # Create new CHANGELOG.md
+          echo "# Changelog" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "All notable changes to this project will be documented in this file." >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          cat temp_changelog.md >> CHANGELOG.md
+        fi
+        
+        rm temp_changelog.md
+
+  build-and-release:
+    runs-on: ubuntu-latest
+    needs: [generate-changelog]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Update project version
+      run: |
+        VERSION="${{ needs.generate-changelog.outputs.version }}"
+        sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>$VERSION<\/PackageVersion>/" ${{ env.PROJECT_PATH }}
+
+    - name: Build and pack
+      run: |
+        dotnet restore ${{ env.PROJECT_PATH }}
+        dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+        dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ${{ env.PACKAGE_OUTPUT_PATH }}
+
+    - name: Create GitHub release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.generate-changelog.outputs.version }}
+        release_name: SolarScope CLI v${{ needs.generate-changelog.outputs.version }}
+        body: |
+          ## 🌞 SolarScope CLI v${{ needs.generate-changelog.outputs.version }}
+          
+          ### What's New
+          ${{ needs.generate-changelog.outputs.changelog }}
+          
+          ### Installation
+          ```bash
+          dotnet tool install --global SolarScope --version ${{ needs.generate-changelog.outputs.version }}
+          ```
+          
+          ### Quick Start
+          ```bash
+          solarscope dashboard
+          ```
+          
+          For complete documentation, see the [README](https://github.com/sujithq/super-duper-funicular#readme).
+        draft: false
+        prerelease: false
+
+    - name: Upload NuGet package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.PACKAGE_OUTPUT_PATH }}/SolarScope.${{ needs.generate-changelog.outputs.version }}.nupkg
+        asset_name: SolarScope.${{ needs.generate-changelog.outputs.version }}.nupkg
+        asset_content_type: application/zip
+
+    - name: Publish to NuGet.org
+      run: |
+        dotnet nuget push ${{ env.PACKAGE_OUTPUT_PATH }}/*.nupkg \
+          --api-key ${{ secrets.NUGET_API_KEY }} \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
+      if: success()
+
+    - name: Commit updates
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add CHANGELOG.md ${{ env.PROJECT_PATH }}
+        git commit -m "chore: release v${{ needs.generate-changelog.outputs.version }}"
+        git push origin main
+      if: success()
