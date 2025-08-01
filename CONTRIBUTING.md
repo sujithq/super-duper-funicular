@@ -2,6 +2,11 @@
 
 Thank you for your interest in contributing to SolarScope CLI! This project was created for GitHub's "For the Love of Code 2025" hackathon, and we welcome contributions that help make solar energy monitoring more accessible and fun.
 
+---
+
+> **Visual Demos:**
+> For live demo GIFs and visual examples of SolarScope CLI, see the [README.md](./README.md#-live-demo-gifs) section. You can also generate your own GIFs using the included VHS tape scripts!
+
 ## 🌟 Ways to Contribute
 
 ### 🐛 Bug Reports
