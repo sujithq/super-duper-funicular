@@ -63,28 +63,60 @@ public class SolarDataService
     /// <summary>
     /// Loads solar data from the JSON file
     /// </summary>
-    public async Task<SolarData?> LoadDataAsync()
+    public async Task<SolarData?> LoadDataAsync(bool verbose = false)
     {
         try
         {
             string jsonContent;
             if (_dataFilePath.StartsWith("http://") || _dataFilePath.StartsWith("https://"))
             {
+                if (verbose)
+                    Console.WriteLine($"[SolarDataService] Downloading data from URL: {_dataFilePath}");
                 using var httpClient = new HttpClient();
                 jsonContent = await httpClient.GetStringAsync(_dataFilePath);
             }
             else
             {
+                string resolvedPath = _dataFilePath;
+                if (verbose)
+                    Console.WriteLine($"[SolarDataService] Checking data file: {resolvedPath}");
                 if (!File.Exists(_dataFilePath))
                 {
-                    throw new FileNotFoundException($"Data file not found: {_dataFilePath}");
+                    var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    var fallbackPath = Path.Combine(userProfile, "SolarScopeData.json");
+                    if (verbose)
+                        Console.WriteLine($"[SolarDataService] Data file not found. Using fallback: {fallbackPath}");
+                    if (!File.Exists(fallbackPath))
+                    {
+                        var appDir = AppContext.BaseDirectory;
+                        var samplePath = Path.Combine(appDir, "data", "sample.json");
+                        if (File.Exists(samplePath))
+                        {
+                            if (verbose)
+                                Console.WriteLine($"[SolarDataService] Copying sample.json from {samplePath} to {fallbackPath}");
+                            File.Copy(samplePath, fallbackPath);
+                        }
+                        else
+                        {
+                            if (verbose)
+                                Console.WriteLine($"[SolarDataService] sample.json not found. Creating empty data file at {fallbackPath}");
+                            await File.WriteAllTextAsync(fallbackPath, "{}\n");
+                        }
+                    }
+                    resolvedPath = fallbackPath;
                 }
-                jsonContent = await File.ReadAllTextAsync(_dataFilePath);
+                if (verbose)
+                    Console.WriteLine($"[SolarDataService] Reading data from: {resolvedPath}");
+                jsonContent = await File.ReadAllTextAsync(resolvedPath);
             }
+            if (verbose)
+                Console.WriteLine($"[SolarDataService] Deserializing data...");
             return JsonSerializer.Deserialize<SolarData>(jsonContent, _jsonOptions);
         }
         catch (Exception ex)
         {
+            if (verbose)
+                Console.WriteLine($"[SolarDataService] ERROR: {ex.Message}");
             throw new InvalidOperationException($"Failed to load solar data: {ex.Message}", ex);
         }
     }
