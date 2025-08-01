@@ -110,7 +110,7 @@ public record BarChartDataWithYear(int Year, BarChartData Data)
             try
             {
                 var date = new DateTime(Year, 1, 1).AddDays(D - 1);
-                return date.ToString("MMM d, yyyy", System.Globalization.CultureInfo.CurrentCulture);
+                return date.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.CurrentCulture);
             }
             catch
             {

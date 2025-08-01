@@ -22,13 +22,13 @@ public abstract class BaseCommand<TSettings> : AsyncCommand<TSettings> where TSe
     /// </summary>
     /// <param name="dayOfYear">Day of year (1-365/366)</param>
     /// <param name="year">The year</param>
-    /// <returns>Formatted date string (e.g., "May 3, 2023") or "Day X" if conversion fails</returns>
+    /// <returns>Formatted date string (e.g., "May 03, 2023") or "Day X" if conversion fails</returns>
     protected static string GetDateFromDayOfYear(int dayOfYear, int year)
     {
         try
         {
             var date = new DateTime(year, 1, 1).AddDays(dayOfYear - 1);
-            return date.ToString("MMM d, yyyy", System.Globalization.CultureInfo.CurrentCulture);
+            return date.ToString("MMM dd, yyyy", System.Globalization.CultureInfo.CurrentCulture);
         }
         catch
         {
