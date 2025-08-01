@@ -18,6 +18,13 @@ echo "✅ Git commit template configured"
 # 2. Set up commit message hook
 echo "🔧 Setting up commit message validation hook..."
 chmod +x .githooks/commit-msg
+
+# Convert to Unix line endings if dos2unix is available (for WSL compatibility)
+if command -v dos2unix &> /dev/null; then
+    dos2unix .githooks/commit-msg 2>/dev/null || true
+    echo "   ℹ️  Converted hook to Unix line endings for WSL compatibility"
+fi
+
 git config core.hooksPath .githooks
 echo "✅ Commit message hook configured"
 
@@ -78,3 +85,5 @@ echo "   • Automatic changelog generation"
 echo "   • Semantic version detection"
 echo "   • Release note creation"
 echo "   • Better project history"
+echo ""
+echo "📝 Note: .gitattributes file ensures consistent line endings across platforms"

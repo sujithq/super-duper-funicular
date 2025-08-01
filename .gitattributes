@@ -1,0 +1,77 @@
+# Git Attributes for SolarScope CLI
+# Ensures consistent line endings and proper handling of different file types
+
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Source code files should use LF line endings
+*.cs text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.xml text eol=lf
+
+# Shell scripts must use LF line endings (critical for Unix/WSL execution)
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Git hook files must use LF line endings (fixes our commitizen issue!)
+.githooks/* text eol=lf
+
+# Windows batch files should use CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Configuration files
+*.config text eol=lf
+*.conf text eol=lf
+*.ini text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.gitmessage text eol=lf
+.czrc text eol=lf
+
+# Documentation and project files
+README* text eol=lf
+LICENSE* text eol=lf
+CHANGELOG* text eol=lf
+CONTRIBUTING* text eol=lf
+*.instructions.md text eol=lf
+
+# Binary files (should not be modified)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# .NET specific files
+*.sln text eol=crlf
+*.csproj text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+
+# Package files
+package.json text eol=lf
+package-lock.json text eol=lf
+*.nuspec text eol=lf
+
+# Visual Studio Code
+.vscode/* text eol=lf
+
+# GitHub files
+.github/* text eol=lf
+
+# Tape files (for terminal recordings)
+*.tape text eol=lf
