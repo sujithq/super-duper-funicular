@@ -145,8 +145,9 @@ public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
     {
         var (totalProduction, totalConsumption, totalInjection) = data.YearlyTotals;
         var latestYearData = data.GetLatestYearData();
+        var latestYearDataWithYear = data.GetLatestYearDataWithYear();
         var averageDaily = latestYearData.Average(d => d.P);
-        var bestDay = latestYearData.MaxBy(d => d.P);
+        var bestDay = latestYearDataWithYear.MaxBy(d => d.P);
         var anomalyCount = latestYearData.Count(d => d.AS.HasAnomaly);
 
         var statsTable = new Table()
@@ -183,8 +184,8 @@ public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
         );
         
         statsTable.AddRow(
-            "Best Production D", 
-            $"[green]D {bestDay?.D} ({bestDay?.P:F2} kWh)[/]", 
+            "Best Production Day", 
+            $"[green]{bestDay?.FormattedDate} ({bestDay?.P:F2} kWh)[/]", 
             "🏆"
         );
         
@@ -246,7 +247,7 @@ public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
             .CenterLabel();
 
         // Get last 20 days for chart
-        var recentDays = data.GetLatestYearData().TakeLast(20).ToList();
+        var recentDays = data.GetLatestYearDataWithYear().TakeLast(20).ToList();
         
         foreach (var day in recentDays)
         {
@@ -258,7 +259,7 @@ public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
                 _ => Color.Red
             };
             
-            chart.AddItem($"D {day.D}", day.P, color);
+            chart.AddItem(day.FormattedDate, day.P, color);
         }
 
         AnsiConsole.Write(chart);
