@@ -1,8 +1,11 @@
 name: Auto-Update Changelog
 
 on:
-  push:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +18,7 @@ env:
 jobs:
   update-changelog:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'chore: update changelog')"
+    if: github.event.workflow_run.conclusion == 'success'
     
     steps:
     - name: Checkout code
@@ -23,16 +26,31 @@ jobs:
       with:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
+        ref: ${{ github.event.workflow_run.head_branch }}
+
+    - name: Check if recent commit is changelog update
+      id: check_recent_commit
+      run: |
+        RECENT_COMMIT=$(git log -1 --pretty=format:"%s")
+        if [[ "$RECENT_COMMIT" == *"chore: update changelog"* ]]; then
+          echo "skip_update=true" >> $GITHUB_OUTPUT
+          echo "Recent commit is already a changelog update, skipping..."
+        else
+          echo "skip_update=false" >> $GITHUB_OUTPUT
+        fi
 
     - name: Setup Node.js
+      if: steps.check_recent_commit.outputs.skip_update == 'false'
       uses: actions/setup-node@v4
       with:
         node-version: '18'
 
     - name: Install conventional-changelog-cli
+      if: steps.check_recent_commit.outputs.skip_update == 'false'
       run: npm install -g conventional-changelog-cli
 
     - name: Get last release tag
+      if: steps.check_recent_commit.outputs.skip_update == 'false'
       id: last_tag
       run: |
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -43,6 +61,7 @@ jobs:
         fi
 
     - name: Generate changelog entries
+      if: steps.check_recent_commit.outputs.skip_update == 'false'
       id: changelog_entries
       run: |
         # Generate conventional changelog for unreleased changes
@@ -58,7 +77,7 @@ jobs:
         fi
 
     - name: Update unreleased section
-      if: steps.changelog_entries.outputs.has_changes == 'true'
+      if: steps.check_recent_commit.outputs.skip_update == 'false' && steps.changelog_entries.outputs.has_changes == 'true'
       run: |
         # Create temp file with new unreleased content
         echo "## [Unreleased]" > temp_unreleased.md
@@ -75,7 +94,7 @@ jobs:
         rm temp_unreleased.md
 
     - name: Commit changelog updates
-      if: steps.changelog_entries.outputs.has_changes == 'true'
+      if: steps.check_recent_commit.outputs.skip_update == 'false' && steps.changelog_entries.outputs.has_changes == 'true'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
