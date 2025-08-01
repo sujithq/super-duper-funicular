@@ -8,6 +8,8 @@ namespace SolarScope
     {
         static async Task<int> Main(string[] args)
         {
+            return await Task.Run(() =>
+        {
             // Display welcome banner
             DisplayWelcomeBanner();
 
@@ -24,6 +26,7 @@ namespace SolarScope
 
             });
             return app.Run(args);
+        });
         }
 
         private static void DisplayWelcomeBanner()
