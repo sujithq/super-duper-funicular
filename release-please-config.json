@@ -1,0 +1,66 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "SolarScope",
+      "changelog-sections": [
+        {
+          "type": "feat",
+          "section": "Features",
+          "includeBody": true
+        },
+        {
+          "type": "fix",
+          "section": "Bug Fixes",
+          "includeBody": true
+        },
+        {
+          "type": "docs",
+          "section": "Documentation",
+          "includeBody": true
+        },
+        {
+          "type": "style",
+          "section": "Styles",
+          "includeBody": true
+        },
+        {
+          "type": "refactor",
+          "section": "Code Refactoring",
+          "includeBody": true
+        },
+        {
+          "type": "perf",
+          "section": "Performance Improvements",
+          "includeBody": true
+        },
+        {
+          "type": "test",
+          "section": "Tests",
+          "includeBody": true
+        },
+        {
+          "type": "build",
+          "section": "Build System",
+          "includeBody": true
+        },
+        {
+          "type": "ci",
+          "section": "Continuous Integration",
+          "includeBody": true
+        },
+        {
+          "type": "chore",
+          "section": "Chores",
+          "includeBody": true
+        }
+      ],
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      "versioning-strategy": "default",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": false,
+      "initial-version": "1.0.0"
+    }
+  }
+}

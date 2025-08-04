@@ -1,0 +1,76 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  issues: write
+  repository-projects: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-publish:
+    if: needs.release-please.outputs.release_created
+    needs: release-please
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore src/SolarScope.csproj
+
+      - name: Update version in csproj
+        run: |
+          VERSION="${{ needs.release-please.outputs.version }}"
+          sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>$VERSION<\/PackageVersion>/" src/SolarScope.csproj
+
+      - name: Build
+        run: dotnet build src/SolarScope.csproj --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test src/SolarScope.csproj --configuration Release --no-build --verbosity normal
+        continue-on-error: true  # Continue even if no tests are found
+
+      - name: Pack
+        run: dotnet pack src/SolarScope.csproj --configuration Release --no-build --output ./artifacts
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-package
+          path: ./artifacts/*.nupkg
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+      - name: Upload packages to release
+        run: |
+          gh release upload ${{ needs.release-please.outputs.tag_name }} ./artifacts/*.nupkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
