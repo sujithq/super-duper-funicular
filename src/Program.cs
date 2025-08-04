@@ -1,6 +1,11 @@
+using Markdig;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using SolarScope.Commands;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System;
+using System.Text;
 
 namespace SolarScope
 {
@@ -8,6 +13,15 @@ namespace SolarScope
     {
         static async Task<int> Main(string[] args)
         {
+
+
+            
+
+
+
+
+
+
             return await Task.Run(() =>
         {
             // Display welcome banner
@@ -30,6 +44,8 @@ namespace SolarScope
         });
         }
 
+
+        
         private static void DisplayWelcomeBanner()
         {
             var rule = new Rule("[yellow]🌞 SolarScope CLI - Your Personal Solar System Command Center 🌞[/]")

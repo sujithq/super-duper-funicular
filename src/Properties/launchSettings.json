@@ -14,7 +14,7 @@
     },
     "SolarScope AI Test": {
       "commandName": "Project",
-      "commandLineArgs": "ai \"SWhat commands are available?\"",
+      "commandLineArgs": "ai \"What commands are available?\"",
       "environmentVariables": {
         "GITHUB_TOKEN": "Test"
       }

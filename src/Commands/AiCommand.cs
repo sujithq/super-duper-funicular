@@ -1,5 +1,9 @@
+using Markdig;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using Spectre.Console.Rendering;
 using System.ComponentModel;
 using System.Net.Http.Headers;
 using System.Text;
@@ -60,8 +64,8 @@ public class AiCommand : AsyncCommand<AiCommand.Settings>
             return 2;
         }
 
-        // Check if response looks like a command
-        var isCommand = aiResponse.Trim().StartsWith("solarscope", StringComparison.OrdinalIgnoreCase);
+        // Check if response looks like a valid solarscope command
+        var isCommand = IsValidSolarScopeCommand(aiResponse.Trim());
 
         if (isCommand)
         {
@@ -90,7 +94,26 @@ public class AiCommand : AsyncCommand<AiCommand.Settings>
         else
         {
             AnsiConsole.MarkupLine("[green]🤖 AI response:[/]");
-            var panel = new Panel(new Markup(aiResponse))
+
+            var ops = CollectOps(aiResponse);
+            
+            var items = new List<IRenderable>();
+            foreach (var op in ops)
+            {
+                switch (op)
+                {
+                    case MarkupLineOp m:
+                        items.Add(new Markup(m.Text));
+                        break;
+                    case WritePanelOp p:
+                        items.Add(new Panel(p.Text).RoundedBorder());
+                        break;
+                    case WriteRuleOp r:
+                        items.Add(new Rule(r.Text));
+                        break;
+                }
+            }
+            var panel = new Panel(new Rows(items))
             {
                 Header = new PanelHeader("[bold]Help & Information[/]"),
                 Border = BoxBorder.Rounded,
@@ -102,6 +125,44 @@ public class AiCommand : AsyncCommand<AiCommand.Settings>
         return 0;
     }
 
+    /// <summary>
+    /// Validates if the given response is a valid SolarScope CLI command
+    /// </summary>
+    /// <param name="response">The response to validate</param>
+    /// <returns>True if it's a valid SolarScope command, false otherwise</returns>
+    private static bool IsValidSolarScopeCommand(string response)
+    {
+        if (string.IsNullOrWhiteSpace(response))
+            return false;
+
+        // Split the response into parts
+        var parts = response.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        
+        // Must have at least 2 parts: "solarscope" and a command
+        if (parts.Length < 2)
+            return false;
+
+        // First part must be "solarscope"
+        if (!parts[0].Equals("solarscope", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        // Valid SolarScope commands
+        var validCommands = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "ai",
+            "analyze", 
+            "dashboard",
+            "anomalies",
+            "report",
+            "weather",
+            "demo",
+            "explore"
+        };
+
+        // Second part must be a valid command
+        return validCommands.Contains(parts[1]);
+    }
+    
     private async Task<string?> GetAiResponseAsync(string userPrompt, string model)
     {
         var githubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
@@ -257,4 +318,104 @@ Instructions:
             return null;
         }
     }
+
+
+    public abstract record RenderOp;
+
+    public record MarkupLineOp(string Text) : RenderOp;
+    public record WritePanelOp(string Text) : RenderOp;
+    public record WriteRuleOp(string Text) : RenderOp;
+
+    private static List<RenderOp> CollectOps(string markdown)
+    {
+        var ops = new List<RenderOp>();
+        var pipeline = new MarkdownPipelineBuilder().Build();
+        var document = Markdown.Parse(markdown, pipeline);
+
+        foreach (var block in document)
+        {
+            switch (block)
+            {
+                case HeadingBlock heading:
+                    var text = ProcessInline(heading.Inline ?? new ContainerInline());
+                    if (heading.Level == 1)
+                        ops.Add(new WriteRuleOp($"[bold yellow]{text}[/]"));
+                    else
+                        ops.Add(new MarkupLineOp($"[bold underline]{text}[/]"));
+                    break;
+
+                case ListBlock list:
+                    CollectListOps(list, 0, ops);
+                    break;
+
+                case ParagraphBlock para:
+                    var pText = ProcessInline(para.Inline ?? new ContainerInline());
+                    ops.Add(new MarkupLineOp(pText));
+                    break;
+
+                case FencedCodeBlock code:
+                    var codeContent = string.Join('\n', code.Lines);
+                    ops.Add(new WritePanelOp($"[grey]{codeContent}[/]"));
+                    break;
+            }
+            ops.Add(new MarkupLineOp("")); // blank line for spacing
+        }
+        return ops;
+    }
+
+    static void CollectListOps(ListBlock list, int indent, List<RenderOp> ops)
+    {
+        int number = 1;
+        if (list.IsOrdered && int.TryParse(list.OrderedStart, out int start))
+            number = start;
+
+        foreach (ListItemBlock item in list)
+        {
+            foreach (var subBlock in item)
+            {
+                if (subBlock is ParagraphBlock para)
+                {
+                    var itemText = ProcessInline(para.Inline ?? new ContainerInline());
+                    var prefix = new string(' ', indent * 2);
+                    if (list.IsOrdered)
+                        ops.Add(new MarkupLineOp($"{prefix}{number++}. {itemText}"));
+                    else
+                        ops.Add(new MarkupLineOp($"{prefix}- {itemText}"));
+                }
+                else if (subBlock is ListBlock nestedList)
+                {
+                    CollectListOps(nestedList, indent + 1, ops);
+                }
+            }
+        }
+    }
+
+    // Convert Markdig inline objects into Spectre.Console markup
+    static string ProcessInline(ContainerInline inline)
+    {
+        var sb = new StringBuilder();
+        foreach (var child in inline)
+        {
+            switch (child)
+            {
+                case LiteralInline lit:
+                    sb.Append(lit.Content.Text.Substring(lit.Content.Start, lit.Content.Length));
+                    break;
+                case EmphasisInline emph:
+                    var inner = ProcessInline(emph);
+                    // 1 '*' = italic, 2 '*' = bold
+                    if (emph.DelimiterCount == 2)
+                        sb.Append($"[bold]{inner}[/]");
+                    else
+                        sb.Append($"[italic]{inner}[/]");
+                    break;
+                case CodeInline code:
+                    sb.Append($"[grey]{code.Content}[/]");
+                    break;
+                    // Add more as needed (links, etc)
+            }
+        }
+        return sb.ToString();
+    }
+
 }
