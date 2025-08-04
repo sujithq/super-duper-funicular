@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/sujithq/super-duper-funicular/compare/v1.1.0...v1.1.1) (2025-08-04)
+
+
+### Continuous Integration
+
+* update csproj to inject release notes for ${{ needs.release-please.outputs.version }} ([14c3c13](https://github.com/sujithq/super-duper-funicular/commit/14c3c13410ec0d0d182eb6e0e5e0fdf40a36767d))
+
 ## [1.1.0](https://github.com/sujithq/super-duper-funicular/compare/v1.0.0...v1.1.0) (2025-08-04)
 
 
