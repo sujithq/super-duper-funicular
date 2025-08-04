@@ -14,6 +14,31 @@
 
 Below are examples of all available commands and their options. Each command supports the global options `--data|-d` (data file path/URL) and `--verbose|-v` (enable verbose output).
 
+### AI Assistant Command
+
+Get help and command suggestions using natural language.
+
+```bash
+solarscope ai <prompt> [--model|-m <model>] [--execute|-x] [--data|-d <file>] [--verbose|-v]
+```
+
+- `<prompt>` : Natural language question or request
+- `--model, -m` : AI model to use (`github/gpt-4o`, `github/o4-mini`) (default: `github/gpt-4o`)
+- `--execute, -x` : Execute suggested commands directly (use with caution)
+- `--data, -d` : Path or URL to the solar data JSON file
+- `--verbose, -v` : Enable verbose output
+
+**Examples:**
+
+```bash
+solarscope ai "Show me the dashboard for last 7 days"
+solarscope ai "How do I find anomalies with high severity?" 
+solarscope ai "What commands are available?" --model github/o4-mini
+solarscope ai "Generate a monthly report for 2024" --execute
+```
+
+**Note:** Requires a GitHub Personal Access Token with 'models:read' permission set in the `GITHUB_TOKEN` environment variable.
+
 ### Dashboard Command
 
 Shows a real-time overview of your solar system.
@@ -163,6 +188,7 @@ solarscope demo -t rainbow -s slow -d ./data/sample.json
 
 ### 🎯 Core Functionality
 
+- **AI Assistant** - Natural language command translation and intelligent help with GitHub Models
 - **Interactive Dashboard** - Real-time solar system overview with beautiful charts
 - **Advanced Analytics** - Production analysis, weather correlation, and trend detection  
 - **Anomaly Detection** - Intelligent system monitoring with severity classification
@@ -285,9 +311,60 @@ The tool analyzes your solar system data including:
   dotnet run -- dashboard --data https://example.com/solar-data.json
   ```
 
-4. **Run the application**
+4. **AI Features Setup (Optional)**
+
+  To use the AI assistant command, you need a GitHub Personal Access Token:
+
+  1. Create a token at [https://github.com/settings/tokens](https://github.com/settings/tokens)
+  2. Enable the 'models:read' permission (under "Beta features")
+  3. Set up your environment:
+
+  **Option A: Development setup (recommended for contributors)**
+  
+  ```bash
+  # Automated setup for both .env and VS Code debugging
+  ./setup-dev.sh              # Bash/WSL/Linux/macOS
+  .\setup-dev.ps1             # PowerShell/Windows
+  
+  # This creates secure local files that won't be committed:
+  # - .env (for command-line usage)
+  # - launchSettings.local.json (for VS Code debugging)
+  ```
+
+  **Option B: Quick command-line setup**
+  
+  ```bash
+  # Quick setup (copies .env.example to .env)
+  ./setup-env.sh              # Bash/WSL/Linux/macOS
+  .\setup-env.ps1             # PowerShell/Windows
+  
+  # Edit .env file and add your GitHub token
+  # Then test:
+  ./run-with-env.sh ai "What commands are available?"     # Bash/WSL
+  .\run-with-env.ps1 ai "What commands are available?"    # PowerShell
+  ```
+
+  **Option B: Set environment variables manually**
+  
+  ```bash
+  # Windows (Command Prompt)
+  set GITHUB_TOKEN=your_token_here
+  
+  # Windows (PowerShell)
+  $env:GITHUB_TOKEN="your_token_here"
+  
+  # Linux/macOS/WSL
+  export GITHUB_TOKEN=your_token_here
+  ```
+
+5. **Run the application**
 
   ```bash
+  # With helper scripts (loads .env automatically)
+  ./run-with-env.sh dashboard          # Bash/WSL
+  .\run-with-env.ps1 dashboard        # PowerShell
+  
+  # Or manually
   dotnet run -- dashboard
   ```
 
@@ -341,31 +418,31 @@ solarscope analyze --type correlation
 # Anomaly detection
 solarscope analyze --type anomalies --count 10
 
-# Custom date range analysis
-solarscope analyze --type weather --start-day 100 --end-day 200
+# Weather pattern analysis
+solarscope analyze --type weather --count 20
 ```
 
 ### Reporting Commands
 
 ```bash
 # Generate monthly report
-solarscope report --type monthly
+solarscope report --period monthly
 
 # Yearly summary report
-solarscope report --type yearly --format table
+solarscope report --period yearly --year 2024
 
-# Export to file
-solarscope report --type monthly --output monthly_report.json --format json
+# Daily report for specific period
+solarscope report --period daily --year 2024 --start-day 100 --end-day 120
 ```
 
 ### Specialized Commands
 
 ```bash
 # Detect system anomalies
-solarscope anomalies --severity medium --interactive
+solarscope anomalies --severity Medium --interactive
 
 # Weather analysis with correlation
-solarscope weather --correlation --historical
+solarscope weather --analysis correlation
 
 # Interactive data exploration
 solarscope explore --mode guided
