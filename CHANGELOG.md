@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0](https://github.com/sujithq/super-duper-funicular/compare/v1.0.0...v1.1.0) (2025-08-04)
+
+
+### Features
+
+* initial release of SolarScope CLI solar monitoring tool ([f08b582](https://github.com/sujithq/super-duper-funicular/commit/f08b58253a876f3d32bb44e5738867a0dfd9d052))
+
+## Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
