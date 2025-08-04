@@ -42,4 +42,5 @@ if ($args.Count -gt 0) {
     Write-Host "🚀 Running: solarscope $command" -ForegroundColor Magenta
     Set-Location src
     dotnet run -- $args
+    cd ..
 }

@@ -49,4 +49,5 @@ echo "🤖 You can now use: solarscope ai 'your question here'"
 if [ $# -gt 0 ]; then
     echo "🚀 Running: solarscope $*"
     cd src && dotnet run -- "$@"
+    cd ..
 fi

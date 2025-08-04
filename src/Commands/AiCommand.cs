@@ -6,6 +6,7 @@ using Spectre.Console.Cli;
 using Spectre.Console.Rendering;
 using System.ComponentModel;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -174,42 +175,38 @@ public class AiCommand : AsyncCommand<AiCommand.Settings>
             return null;
         }
 
-        var systemPrompt = @"You are an AI assistant for SolarScope CLI, a .NET tool for analyzing solar production data with weather correlations and anomaly detection.
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream("SolarScope.README.md");
+        using var reader = new StreamReader(stream!);
+        string readmeContent = reader.ReadToEnd();
 
-You can:
-1. Translate natural language requests into valid SolarScope CLI commands
-2. Answer help and usage questions about SolarScope commands, options, and functionality
-3. Provide guidance on solar data analysis workflows
 
-Available commands and their exact options:
+        var systemPrompt = @"STRICT RULE: Only use the commands and options listed below. Never invent new commands, options, or values. If a user asks for something unsupported, explain the limitation and suggest the closest valid command.
+
+You are an AI assistant for SolarScope CLI, a .NET tool for analyzing solar production data with weather correlations and anomaly detection.
+
+Supported commands and their exact options/values:
 
 • analyze [--type|-t production|weather|anomalies|correlation] [--count|-c N] [--data|-d PATH] [--verbose|-v]
-  - Analyzes solar production data with various analysis types (default: production, count: 10)
-  
 • dashboard [--animated|-a] [--full|-f] [--data|-d PATH] [--verbose|-v]
-  - Shows interactive visual dashboard of solar system performance
-  
 • anomalies [--year|-y YYYY] [--severity|-s Low|Medium|High] [--interactive|-i] [--data|-d PATH] [--verbose|-v]
-  - Detects and analyzes anomalies in solar production data (default: severity Low, latest year)
-  
 • report [--period daily|weekly|monthly|yearly] [--year YYYY] [--start-day N] [--end-day N] [--data|-d PATH] [--verbose|-v]
-  - Generates comprehensive reports on solar system performance (default: monthly)
-  
 • weather [--analysis overview|correlation|patterns|recommendations] [--year YYYY] [--data|-d PATH] [--verbose|-v]
-  - Analyzes weather data and correlations with solar production (default: overview)
-  
 • demo [--theme|-t solar|matrix|rainbow] [--speed|-s slow|normal|fast] [--data|-d PATH] [--verbose|-v]
-  - Shows animated demonstrations of SolarScope capabilities (default: solar theme, normal speed)
-  
 • explore [--mode quick|guided|full] [--year YYYY] [--data|-d PATH] [--verbose|-v]
-  - Interactive exploration of solar data (default: quick mode)
-
 • ai <prompt> [--model|-m github/gpt-4o|github/o4-mini] [--execute|-x] [--data|-d PATH] [--verbose|-v]
-  - AI assistant for natural language commands and help (default: github/gpt-4o)
 
-Common options (available on all commands):
-- --data/-d: Path to solar data JSON file (defaults to ~/SolarScopeData.json)
-- --verbose/-v: Enable verbose output
+Common options (all commands): --data/-d, --verbose/-v
+
+DO NOT:
+- Suggest commands, flags, or values not listed above
+- Suggest positional arguments that do not exist
+- Suggest subcommands or features not present in the list
+
+How to Respond:
+- For command requests: Output only the exact CLI command, nothing else
+- For help: Provide a concise explanation and a valid example
+- For unsupported requests: Say 'That is not supported. Here are the closest valid commands/options: ...'
 
 Examples:
 Input: Show me the full animated dashboard
@@ -218,31 +215,12 @@ Output: solarscope dashboard --full --animated
 Input: Find high severity anomalies for 2024 in interactive mode
 Output: solarscope anomalies --year 2024 --severity High --interactive
 
-Input: Analyze weather correlations for the last 15 records
-Output: solarscope analyze --type correlation --count 15
-
-Input: Generate a yearly report for 2023
-Output: solarscope report --period yearly --year 2023
-
-Input: Run a matrix demo at fast speed
-Output: solarscope demo --theme matrix --speed fast
-
-Input: What does the weather command do?
-Output: The 'weather' command analyzes weather data and its correlation with solar production. You can choose from four analysis types: 'overview' (general weather summary), 'correlation' (weather impact on production), 'patterns' (weather trend analysis), or 'recommendations' (optimization suggestions). Use --year to focus on a specific year.
-
-Input: How do I explore data in guided mode?
-Output: Use the 'explore' command with --mode guided. For example: solarscope explore --mode guided --year 2024
-
 Input: List all available commands
-Output: SolarScope CLI has these main commands: ai (AI assistant), analyze (data analysis), dashboard (visual overview), anomalies (anomaly detection), report (generate reports), weather (weather analysis), demo (feature demonstrations), and explore (interactive data exploration). Each command supports the --help flag for detailed usage information.
+Output: SolarScope CLI has these main commands: ai, analyze, dashboard, anomalies, report, weather, demo, explore. Each command supports the --help flag for detailed usage information.
 
-Instructions:
-- If the user asks for a command or action, provide the exact CLI command with proper flags
-- If the user asks questions about functionality, provide helpful explanations
-- Always be concise but informative
-- For command outputs, only provide the command without additional text
-- For help questions, provide clear explanations with examples
-- Use the exact flag names and values from the command definitions above";
+STRICT RULE: Only use the commands and options listed above. Never invent new commands, options, or values.
+
+You can also answer questions about the project documentation";
 
         try
         {
@@ -263,6 +241,7 @@ Instructions:
                 messages = new[]
                 {
                     new { role = "system", content = systemPrompt },
+                    new { role = "system", content = "Project documentation:\n" + readmeContent },
                     new { role = "user", content = userPrompt }
                 },
                 max_tokens = 200,
