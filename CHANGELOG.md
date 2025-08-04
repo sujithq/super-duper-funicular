@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/sujithq/super-duper-funicular/compare/v1.0.0...v1.0.1) (2025-08-04)
+
+
+### Continuous Integration
+
+* add comprehensive CI/CD pipeline with build validation ([1895c39](https://github.com/sujithq/super-duper-funicular/commit/1895c3934b0ae81ce344211f7e64c8d7af7627af))
+
 ## 1.0.0 (2025-08-04)
 
 
