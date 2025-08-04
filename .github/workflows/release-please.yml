@@ -48,6 +48,26 @@ jobs:
           VERSION="${{ needs.release-please.outputs.version }}"
           sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>$VERSION<\/PackageVersion>/" src/SolarScope.csproj
 
+      # --------- Inject release notes step (NEW) ----------
+      - name: Inject release notes into csproj
+        run: |
+          VERSION="${{ needs.release-please.outputs.version }}"
+
+          # Extract release notes for this version from CHANGELOG.md
+          RELEASE_NOTES=$(awk "/^## \\[$VERSION\\]/ {flag=1; next} /^## \\[/ {flag=0} flag" CHANGELOG.md | sed '/^$/d')
+
+          # Escape special XML chars for csproj
+          ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+
+          # Replace or add the PackageReleaseNotes element in the csproj
+          if grep -q "<PackageReleaseNotes>" src/SolarScope.csproj; then
+            # Replace content between tags
+            sed -i "/<PackageReleaseNotes>/,/<\/PackageReleaseNotes>/c\<PackageReleaseNotes>$ESCAPED_NOTES</PackageReleaseNotes>" src/SolarScope.csproj
+          else
+            # Add after <PropertyGroup>
+            sed -i "/<PropertyGroup>/a \  <PackageReleaseNotes>$ESCAPED_NOTES</PackageReleaseNotes>" src/SolarScope.csproj
+          fi
+
       - name: Build
         run: dotnet build src/SolarScope.csproj --configuration Release --no-restore
 
