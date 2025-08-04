@@ -1,9 +1,5 @@
 {
   "profiles": {
-    "SolarScope": {
-      "commandName": "Project",
-      "commandLineArgs": "analyze -v -t production"
-    },
     "SolarScope Dashboard Animated": {
       "commandName": "Project",
       "commandLineArgs": "dashboard --animated"
@@ -15,6 +11,13 @@
     "SolarScope Help": {
       "commandName": "Project",
       "commandLineArgs": "--help"
+    },
+    "SolarScope AI Test": {
+      "commandName": "Project",
+      "commandLineArgs": "ai \"SWhat commands are available?\"",
+      "environmentVariables": {
+        "GITHUB_TOKEN": "Test"
+      }
     }
   }
 }

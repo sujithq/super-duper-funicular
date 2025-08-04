@@ -16,6 +16,7 @@ namespace SolarScope
             var app = new CommandApp();
             app.Configure(config =>
             {
+                config.AddCommand<AiCommand>("ai");
                 config.AddCommand<AnalyzeCommand>("analyze");
                 config.AddCommand<AnomaliesCommand>("anomalies");
                 config.AddCommand<DashboardCommand>("dashboard");

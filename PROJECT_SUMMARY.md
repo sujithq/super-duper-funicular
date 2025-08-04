@@ -259,15 +259,15 @@ solarscope dashboard --animated --full # Dynamic experience
 solarscope analyze --type production --count 15
 solarscope analyze --type correlation
 solarscope analyze --type anomalies
-solarscope analyze --type weather --start-day 100 --end-day 200
+solarscope analyze --type weather --count 20
 
 # Reporting commands
-solarscope report --type monthly
-solarscope report --type yearly --format json --output report.json
+solarscope report --period monthly
+solarscope report --period yearly --year 2024
 
 # Specialized commands
-solarscope anomalies --severity high --interactive
-solarscope weather --correlation --historical
+solarscope anomalies --severity High --interactive
+solarscope weather --analysis correlation
 solarscope explore --mode guided
 
 # Demo commands
