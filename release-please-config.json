@@ -14,39 +14,48 @@
   "changelog-sections": [
     {
       "type": "feat",
-      "section": "Features"
+      "section": "Features",
+      "bump": "minor"
     },
     {
       "type": "fix", 
-      "section": "Bug Fixes"
+      "section": "Bug Fixes",
+      "bump": "patch"
     },
     {
       "type": "docs",
-      "section": "Documentation"
+      "section": "Documentation",
+      "bump": false
     },
     {
       "type": "perf",
-      "section": "Performance Improvements"
+      "section": "Performance Improvements",
+      "bump": "patch"
     },
     {
       "type": "refactor",
-      "section": "Code Refactoring"
+      "section": "Code Refactoring",
+      "bump": false
     },
     {
       "type": "test",
-      "section": "Tests"
+      "section": "Tests",
+      "bump": false
     },
     {
       "type": "build",
-      "section": "Build System"
+      "section": "Build System",
+      "bump": false
     },
     {
       "type": "ci",
-      "section": "Continuous Integration"
+      "section": "Continuous Integration",
+      "bump": false
     },
     {
       "type": "chore",
-      "section": "Chores"
+      "section": "Chores",
+      "bump": false
     }
   ]
 }
