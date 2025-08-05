@@ -81,6 +81,21 @@ jobs:
             sed -i "/<PropertyGroup>/a \  <PackageReleaseNotes>$ESCAPED_NOTES</PackageReleaseNotes>" src/SolarScope.csproj
           fi
 
+          # Save release notes for later use in NuGet push (for GitHub Actions output)
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Commit release notes update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/SolarScope.csproj
+          git commit -m "chore: update release notes in csproj for v${{ needs.release-please.outputs.version }} [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build
         run: dotnet build src/SolarScope.csproj --configuration Release --no-restore
 
@@ -91,6 +106,15 @@ jobs:
       - name: Pack
         run: dotnet pack src/SolarScope.csproj --configuration Release --no-build --output ./artifacts
 
+      - name: Verify package metadata
+        run: |
+          echo "Verifying package contains release notes..."
+          # Extract and display the PackageReleaseNotes from csproj to confirm they were added
+          grep -A5 -B5 "PackageReleaseNotes" src/SolarScope.csproj || echo "No PackageReleaseNotes found in csproj"
+          
+          # List the generated package
+          ls -la ./artifacts/
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -98,12 +122,30 @@ jobs:
           path: ./artifacts/*.nupkg
 
       - name: Publish to NuGet
-        run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: |
+          echo "Publishing to NuGet with release notes:"
+          echo "----------------------------------------"
+          echo "$RELEASE_NOTES"
+          echo "----------------------------------------"
+          
+          # Push to NuGet (release notes are embedded in the package via PackageReleaseNotes in csproj)
+          dotnet nuget push ./artifacts/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate \
+            --timeout 300
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
       - name: Upload packages to release
         run: |
+          echo "Uploading packages to GitHub release..."
+          echo "Release notes for this version:"
+          echo "================================"
+          echo "$RELEASE_NOTES"
+          echo "================================"
+          
+          # Upload the NuGet package to the GitHub release
           gh release upload ${{ needs.release-please.outputs.tag_name }} ./artifacts/*.nupkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
