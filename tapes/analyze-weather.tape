@@ -4,7 +4,7 @@ Set WindowBar Colorful
 Set Height 1920
 Set Width 1080
 
-Type "../src/bin/Debug/net9.0/SolarScope analyze --type weather"
+Type "solarscope analyze --type weather"
 Enter
 
 Sleep 10s
