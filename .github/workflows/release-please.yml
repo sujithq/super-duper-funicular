@@ -48,7 +48,20 @@ jobs:
           VERSION="${{ needs.release-please.outputs.version }}"
           sed -i "s/<PackageVersion>.*<\/PackageVersion>/<PackageVersion>$VERSION<\/PackageVersion>/" src/SolarScope.csproj
 
-      # --------- Inject release notes step (NEW) ----------
+      - name: Update version in README.md badge/link
+        run: |
+          VERSION="${{ needs.release-please.outputs.version }}"
+          sed -i "s|/packages/SolarScope/[0-9.]*|/packages/SolarScope/$VERSION|g" README.md      # --------- Inject release notes step (NEW) ----------
+
+      - name: Commit and push version/badge updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/SolarScope.csproj README.md
+          git commit -m "chore: update version and badge in csproj and README.md [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Inject release notes into csproj
         run: |
           VERSION="${{ needs.release-please.outputs.version }}"

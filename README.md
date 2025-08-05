@@ -5,7 +5,7 @@
 [![Spectre.Console](https://img.shields.io/badge/Spectre.Console-0.49.1-blue?style=flat-square)](https://spectreconsole.net/)
 [![Spectre.Console.Cli](https://img.shields.io/badge/Spectre.Console.Cli-2.x-blue?style=flat-square)](https://spectreconsole.net/cli/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-![NuGet Version](https://img.shields.io/nuget/v/Solarscope)
+[![NuGet Version](https://img.shields.io/nuget/v/Solarscope)](https://www.nuget.org/packages/SolarScope/1.1.0)
 **A beautiful, interactive command-line tool for monitoring and analyzing your solar energy system with weather correlations and anomaly detection.**
 
 > Built with ❤️ for GitHub's "For the Love of Code 2025" hackathon - Category 3: Terminal talent
