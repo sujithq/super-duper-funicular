@@ -20,7 +20,7 @@
 
 ### Code Refactoring
 
-* allign with docs ([8b5eb01](https://github.com/sujithq/super-duper-funicular/commit/8b5eb016650ffc9da9d06fbfd37be0cd4817c93b))
+* align with docs ([8b5eb01](https://github.com/sujithq/super-duper-funicular/commit/8b5eb016650ffc9da9d06fbfd37be0cd4817c93b))
 
 
 ### Continuous Integration
