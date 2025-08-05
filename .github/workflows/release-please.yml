@@ -51,47 +51,99 @@ jobs:
       - name: Update version in README.md badge/link
         run: |
           VERSION="${{ needs.release-please.outputs.version }}"
-          sed -i "s|/packages/SolarScope/[0-9.]*|/packages/SolarScope/$VERSION|g" README.md      # --------- Inject release notes step (NEW) ----------
+          sed -i "s|/packages/SolarScope/[0-9.]*|/packages/SolarScope/$VERSION|g" README.md
 
-      - name: Commit and push version/badge updates
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/SolarScope.csproj README.md
-          git commit -m "chore: update version and badge in csproj and README.md [skip ci]" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Inject release notes into csproj
         run: |
           VERSION="${{ needs.release-please.outputs.version }}"
 
-          # Extract release notes for this version from CHANGELOG.md
-          RELEASE_NOTES=$(awk "/^## \\[$VERSION\\]/ {flag=1; next} /^## \\[/ {flag=0} flag" CHANGELOG.md | sed '/^$/d')
+          # Use Python to safely inject release notes
+          python3 << 'EOF'
+          import re
+          import sys
 
-          # Escape special XML chars for csproj
-          ESCAPED_NOTES=$(echo "$RELEASE_NOTES" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+          version = "${{ needs.release-please.outputs.version }}"
 
-          # Replace or add the PackageReleaseNotes element in the csproj
-          if grep -q "<PackageReleaseNotes>" src/SolarScope.csproj; then
-            # Replace content between tags
-            sed -i "/<PackageReleaseNotes>/,/<\/PackageReleaseNotes>/c\<PackageReleaseNotes>$ESCAPED_NOTES</PackageReleaseNotes>" src/SolarScope.csproj
-          else
-            # Add after <PropertyGroup>
-            sed -i "/<PropertyGroup>/a \  <PackageReleaseNotes>$ESCAPED_NOTES</PackageReleaseNotes>" src/SolarScope.csproj
-          fi
+          # Read CHANGELOG.md
+          with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
+              changelog = f.read()
+
+          # Extract release notes for this version
+          pattern = rf'^## \[{re.escape(version)}\].*?(?=^## \[|\Z)'
+          match = re.search(pattern, changelog, re.MULTILINE | re.DOTALL)
+          
+          if not match:
+              print(f"No release notes found for version {version}")
+              sys.exit(1)
+              
+          # Get content after the version header
+          content = match.group(0)
+          lines = content.split('\n')[2:]  # Skip version header and empty line
+          
+          # Remove empty lines at the end
+          while lines and not lines[-1].strip():
+              lines.pop()
+              
+          release_notes = '\n'.join(lines).strip()
+          
+          # Read csproj file
+          with open('src/SolarScope.csproj', 'r', encoding='utf-8') as f:
+              csproj = f.read()
+
+          # Escape XML special characters
+          escaped_notes = (release_notes
+                          .replace('&', '&amp;')
+                          .replace('<', '&lt;')
+                          .replace('>', '&gt;'))
+
+          # Replace or add PackageReleaseNotes
+          if '<PackageReleaseNotes>' in csproj:
+              # Replace existing content
+              pattern = r'<PackageReleaseNotes>.*?</PackageReleaseNotes>'
+              replacement = f'<PackageReleaseNotes>{escaped_notes}</PackageReleaseNotes>'
+              csproj = re.sub(pattern, replacement, csproj, flags=re.DOTALL)
+              print("Replaced existing PackageReleaseNotes")
+          else:
+              # Add after PackageReadmeFile
+              pattern = r'(<PackageReadmeFile>.*?</PackageReadmeFile>)'
+              replacement = rf'\1\n    <PackageReleaseNotes>{escaped_notes}</PackageReleaseNotes>'
+              csproj = re.sub(pattern, replacement, csproj)
+              print("Added new PackageReleaseNotes")
+
+          # Write back the csproj file
+          with open('src/SolarScope.csproj', 'w', encoding='utf-8') as f:
+              f.write(csproj)
+
+          print("Successfully updated csproj file")
+          EOF
 
           # Save release notes for later use in NuGet push (for GitHub Actions output)
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo "$RELEASE_NOTES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          python3 << 'EOF' >> $GITHUB_ENV
+          import re
 
-      - name: Commit release notes update
+          version = "${{ needs.release-please.outputs.version }}"
+
+          with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
+              changelog = f.read()
+
+          pattern = rf'^## \[{re.escape(version)}\].*?(?=^## \[|\Z)'
+          match = re.search(pattern, changelog, re.MULTILINE | re.DOTALL)
+          content = match.group(0)
+          lines = content.split('\n')[2:]
+          while lines and not lines[-1].strip():
+              lines.pop()
+          raw_notes = '\n'.join(lines).strip()
+          print(f"RELEASE_NOTES<<EOF")
+          print(raw_notes)
+          print("EOF")
+          EOF
+
+      - name: Commit and push version/badge/release notes updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/SolarScope.csproj
-          git commit -m "chore: update release notes in csproj for v${{ needs.release-please.outputs.version }} [skip ci]" || echo "No changes to commit"
+          git add src/SolarScope.csproj README.md
+          git commit -m "chore: update version, badge, and release notes [skip ci]" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
