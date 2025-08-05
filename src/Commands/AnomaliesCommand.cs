@@ -153,7 +153,7 @@ public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
                     $"[{severityColor}]{anomaly.AS.Severity}[/]",
                     $"{anomaly.P:F2} kWh",
                     $"{anomaly.U:F2} kWh",
-                    $"{(anomaly.I / 1000.0):F2} kWh",
+                    $"{anomaly.I / 1000:F2} kWh",  // I is in Wh, convert to kWh for display
                     $"{anomaly.AS.TotalAnomalyScore:F2}",
                     anomaly.MS.Condition.ToString()
                 );
@@ -197,16 +197,14 @@ public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
         AnsiConsole.Write(weatherTable);
 
         // Production anomaly insights
-        var highProdAnomalies = anomalies.Where(a => a.AS.ProductionAnomaly > 0).Count();
-        var lowProdAnomalies = anomalies.Where(a => a.AS.ProductionAnomaly < 0).Count();
-        var highConsAnomalies = anomalies.Where(a => a.AS.ConsumptionAnomaly > 0).Count();
-        var lowConsAnomalies = anomalies.Where(a => a.AS.ConsumptionAnomaly < 0).Count();
+        var prodAnomalies = anomalies.Where(a => a.AS.ProductionAnomalyValue != 0).Count();
+        var consAnomalies = anomalies.Where(a => a.AS.ConsumptionAnomalyValue != 0).Count();
+        var injectionAnomalies = anomalies.Where(a => a.AS.InjectionAnomalyValue != 0).Count();
 
         var insightsPanel = new Panel(new Markup(
-            $"[green]High Production Anomalies: {highProdAnomalies}[/]\n" +
-            $"[red]Low Production Anomalies: {lowProdAnomalies}[/]\n" +
-            $"[blue]High Consumption Anomalies: {highConsAnomalies}[/]\n" +
-            $"[orange1]Low Consumption Anomalies: {lowConsAnomalies}[/]\n\n" +
+            $"[green]Production Anomalies: {prodAnomalies}[/]\n" +
+            $"[blue]Consumption Anomalies: {consAnomalies}[/]\n" +
+            $"[orange1]Injection Anomalies: {injectionAnomalies}[/]\n\n" +
             $"[yellow]Most Common Weather During Anomalies: {weatherPatterns.First().Condition}[/]\n" +
             $"[gray]Peak Anomaly Score: {anomalies.Max(a => a.AS.TotalAnomalyScore):F2}[/]"))
         {
@@ -463,7 +461,7 @@ public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
                 $"[white]Status: {anomalyStatus}[/]\n" +
                 $"[green]Production: {dayData.P:F2} kWh[/]\n" +
                 $"[blue]Consumption: {dayData.U:F2} kWh[/]\n" +
-                $"[orange1]Grid Injection: {dayData.I:F2} kWh[/]\n" +
+                $"[orange1]Grid Injection: {dayData.I / 1000:F2} kWh[/]\n" +  // I is in Wh, convert to kWh for display
                 $"[gray]Energy Balance: {dayData.EnergyBalance:F2} kWh[/]"))
             {
                 Header = new PanelHeader("[bold]D Overview[/]"),
@@ -493,9 +491,9 @@ public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
             {
                 var anomalyPanel = new Panel(new Markup(
                     $"[red]Anomaly Score: {dayData.AS.TotalAnomalyScore:F2}[/]\n" +
-                    $"[green]Production Anomaly: {dayData.AS.ProductionAnomaly:F2}[/]\n" +
-                    $"[blue]Consumption Anomaly: {dayData.AS.ConsumptionAnomaly:F2}[/]\n" +
-                    $"[orange1]Injection Anomaly: {dayData.AS.InjectionAnomaly:F2}[/]"))
+                    $"[green]Production Anomaly: {dayData.AS.ProductionAnomalyValue:F2}[/]\n" +
+                    $"[blue]Consumption Anomaly: {dayData.AS.ConsumptionAnomalyValue:F2}[/]\n" +
+                    $"[orange1]Injection Anomaly: {dayData.AS.InjectionAnomalyValue:F2}[/]"))
                 {
                     Header = new PanelHeader("[bold red]Anomaly Analysis[/]"),
                     Border = BoxBorder.Rounded,
@@ -511,7 +509,7 @@ public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
                 $"[yellow]Peak Production: {dayData.PeakProduction:F2} kWh[/]\n" +
                 $"[white]Average Production: {dayData.AverageProduction:F2} kWh[/]\n" +
                 $"[blue]Peak Demand Hour: {dayData.Q.PeakDemandHour:F1}[/]\n" +
-                $"[orange1]Peak Generation Hour: {dayData.Q.PeakGenerationHour:F1}[/]"))
+                $"[orange1]Peak Gas Consumption Hour: {dayData.Q.PeakGasConsumptionHour:F1}[/]"))
             {
                 Header = new PanelHeader("[bold]Performance Metrics[/]"),
                 Border = BoxBorder.Rounded,

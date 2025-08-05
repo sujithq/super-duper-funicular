@@ -6,17 +6,17 @@ namespace SolarScope.Models;
 /// Represents a daily solar system and weather data entry
 /// </summary>
 public record BarChartData(
-    [property: JsonPropertyName("D")] int D,
-    [property: JsonPropertyName("P")] double P,
-    [property: JsonPropertyName("U")] double U,
-    [property: JsonPropertyName("I")] double I,
-    [property: JsonPropertyName("J")] bool J,
-    [property: JsonPropertyName("S")] bool S,
+    [property: JsonPropertyName("D")] int D,           // Day of year (1-366)
+    [property: JsonPropertyName("P")] double P,        // Total daily production (kWh)
+    [property: JsonPropertyName("U")] double U,        // Total daily consumption (kWh)
+    [property: JsonPropertyName("I")] double I,        // Total daily grid injection (Wh)
+    [property: JsonPropertyName("J")] bool J,          // System processing flag (can be ignored)
+    [property: JsonPropertyName("S")] bool S,          // System processing flag (can be ignored)
     [property: JsonPropertyName("MS")] MeteoStatData MS,
-    [property: JsonPropertyName("M")] bool M,
+    [property: JsonPropertyName("M")] bool M,          // System processing flag (can be ignored)
     [property: JsonPropertyName("AS")] AnomalyData AS,
     [property: JsonPropertyName("Q")] QuarterData Q,
-    [property: JsonPropertyName("C")] bool C = false,
+    [property: JsonPropertyName("C")] bool C = false,  // System processing flag (can be ignored)
     [property: JsonPropertyName("SRS")] SunRiseSet SRS = default!
 )
 {
@@ -142,27 +142,26 @@ public record BarChartDataWithYear(int Year, BarChartData Data)
 /// Represents anomaly detection data
 /// </summary>
 public record AnomalyData(
-    [property: JsonPropertyName("P")] double ProductionAnomaly,
-    [property: JsonPropertyName("U")] double ConsumptionAnomaly,
-    [property: JsonPropertyName("I")] double InjectionAnomaly,
+    [property: JsonPropertyName("P")] double ProductionAnomalyValue,
+    [property: JsonPropertyName("U")] double ConsumptionAnomalyValue,
+    [property: JsonPropertyName("I")] double InjectionAnomalyValue,
     [property: JsonPropertyName("A")] bool HasAnomaly
 )
 {
     /// <summary>
-    /// Gets the total anomaly score
+    /// Gets the total anomaly score (only meaningful when HasAnomaly is true)
     /// </summary>
-    public double TotalAnomalyScore => Math.Abs(ProductionAnomaly) + Math.Abs(ConsumptionAnomaly) + Math.Abs(InjectionAnomaly);
+    public double TotalAnomalyScore => Math.Abs(ProductionAnomalyValue) + Math.Abs(ConsumptionAnomalyValue) + Math.Abs(InjectionAnomalyValue);
     
     /// <summary>
-    /// Determines the anomaly severity level
+    /// Determines the anomaly severity level based on magnitude of values
     /// </summary>
-    public AnomalySeverity Severity => TotalAnomalyScore switch
+    public AnomalySeverity Severity => HasAnomaly ? TotalAnomalyScore switch
     {
-        < 1.0 => AnomalySeverity.None,
-        < 5.0 => AnomalySeverity.Low,
-        < 10.0 => AnomalySeverity.Medium,
+        < 1.0 => AnomalySeverity.Low,
+        < 5.0 => AnomalySeverity.Medium,
         _ => AnomalySeverity.High
-    };
+    } : AnomalySeverity.None;
 };
 
 /// <summary>
@@ -187,15 +186,18 @@ public record AnomalyModalData(
 
 /// <summary>
 /// Represents quarter-hourly measurement data
+/// <summary>
+/// Represents quarter-hourly (15-minute interval) measurement data
+/// 96 measurements per day covering all 24 hours
 /// </summary>
 public record QuarterData(
-    [property: JsonPropertyName("C")] List<double> ConsumptionReadings,
-    [property: JsonPropertyName("I")] List<double> InjectionReadings,
-    [property: JsonPropertyName("G")] List<double> GenerationReadings,
-    [property: JsonPropertyName("P")] List<double> ProductionReadings,
-    [property: JsonPropertyName("WRT")] List<double>? WaterReturnTemp,
-    [property: JsonPropertyName("WOT")] List<double>? WaterOutletTemp,
-    [property: JsonPropertyName("WP")] List<double>? WaterPressure
+    [property: JsonPropertyName("C")] List<double> ConsumptionReadings,       // kWh per 15-min interval
+    [property: JsonPropertyName("I")] List<double> InjectionReadings,         // Wh per 15-min interval  
+    [property: JsonPropertyName("G")] List<double> GasConsumptionReadings,    // kWh per 15-min interval
+    [property: JsonPropertyName("P")] List<double> ProductionReadings,        // kWh per 15-min interval
+    [property: JsonPropertyName("WRT")] List<double>? WaterReturnTemp,        // °C (optional)
+    [property: JsonPropertyName("WOT")] List<double>? WaterOutletTemp,        // °C (optional)
+    [property: JsonPropertyName("WP")] List<double>? WaterPressure            // bar (optional)
 )
 {
     /// <summary>
@@ -222,14 +224,14 @@ public record QuarterData(
     }
     
     /// <summary>
-    /// Calculates peak generation time (hour of day)
+    /// Calculates peak gas consumption time (hour of day)
     /// </summary>
-    public double PeakGenerationHour
+    public double PeakGasConsumptionHour
     {
         get
         {
-            if (GenerationReadings.Count == 0) return 0;
-            var maxIndex = GenerationReadings.IndexOf(GenerationReadings.Max());
+            if (GasConsumptionReadings.Count == 0) return 0;
+            var maxIndex = GasConsumptionReadings.IndexOf(GasConsumptionReadings.Max());
             return maxIndex * 0.25; // Convert to hour of day
         }
     }

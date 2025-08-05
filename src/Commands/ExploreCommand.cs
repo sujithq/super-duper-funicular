@@ -807,9 +807,9 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
                     $"[red]🚨 ANOMALY DETECTED[/]\n" +
                     $"[white]Severity: {dayData.AS.Severity}[/]\n" +
                     $"[yellow]Total Score: {dayData.AS.TotalAnomalyScore:F2}[/]\n" +
-                    $"[green]Production Anomaly: {dayData.AS.ProductionAnomaly:F2}[/]\n" +
-                    $"[blue]Consumption Anomaly: {dayData.AS.ConsumptionAnomaly:F2}[/]\n" +
-                    $"[orange1]Injection Anomaly: {dayData.AS.InjectionAnomaly:F2}[/]"))
+                    $"[green]Production Anomaly: {dayData.AS.ProductionAnomalyValue:F2}[/]\n" +
+                    $"[blue]Consumption Anomaly: {dayData.AS.ConsumptionAnomalyValue:F2}[/]\n" +
+                    $"[orange1]Injection Anomaly: {dayData.AS.InjectionAnomalyValue:F2}[/]"))
                 {
                     Header = new PanelHeader("[bold red]Anomaly Analysis[/]"),
                     Border = BoxBorder.Rounded,
@@ -825,7 +825,7 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
                 $"[cyan]📊 Quarter-hour Readings: {dayData.Q.TotalReadings}[/]\n" +
                 $"[white]⏱️ Time Span: {dayData.Q.TimeSpanHours:F1} hours[/]\n" +
                 $"[yellow]🔝 Peak Demand Hour: {dayData.Q.PeakDemandHour:F1}[/]\n" +
-                $"[green]⚡ Peak Generation Hour: {dayData.Q.PeakGenerationHour:F1}[/]"))
+                $"[green]⚡ Peak Gas Consumption Hour: {dayData.Q.PeakGasConsumptionHour:F1}[/]"))
             {
                 Header = new PanelHeader("[bold]Detailed Readings[/]"),
                 Border = BoxBorder.Rounded,

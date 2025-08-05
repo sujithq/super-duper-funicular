@@ -5,6 +5,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using Spectre.Console.Rendering;
 using System.ComponentModel;
+using System.IO;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
@@ -63,6 +64,15 @@ public class AiCommand : AsyncCommand<AiCommand.Settings>
         {
             AnsiConsole.MarkupLine("[red]❌ No response received or an error occurred.[/]");
             return 2;
+        }
+
+        // Debug logging for AI response
+        if (settings.Verbose)
+        {
+            AnsiConsole.MarkupLine("[dim]🐛 DEBUG: AI Response:[/]");
+            AnsiConsole.WriteLine(aiResponse);
+            AnsiConsole.MarkupLine("[dim]🐛 DEBUG: Response length: {0} characters[/]", aiResponse.Length);
+            AnsiConsole.WriteLine();
         }
 
         // Check if response looks like a valid solarscope command
@@ -271,14 +281,28 @@ You can also answer questions about the project documentation";
 
             var responseString = await response.Content.ReadAsStringAsync();
 
+
             // Deserialize and extract the message
             using var doc = JsonDocument.Parse(responseString);
+
             var content = doc.RootElement
                 .GetProperty("choices")[0]
                 .GetProperty("message")
                 .GetProperty("content")
                 .GetString();
 
+#if DEBUG
+            // Log the raw response to file for debugging
+            var debugLogPath = Path.Combine(Path.GetTempPath(), "solarscope-ai-debug.log");
+            try
+            {
+                var logEntry = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] User Prompt: {userPrompt}\n" +
+                              $"Raw API Response: {content}\n" +
+                              new string('=', 80) + "\n";
+                await File.AppendAllTextAsync(debugLogPath, logEntry);
+            }
+            catch { /* Ignore logging errors */ }
+#endif
             return content?.Trim();
         }
         catch (HttpRequestException ex)

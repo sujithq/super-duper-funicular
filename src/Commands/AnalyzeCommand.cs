@@ -312,8 +312,8 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                 table.AddRow(
                     day.FormattedDate,
                     $"[{severityColor}]{day.AS.Severity}[/]",
-                    $"{day.AS.ProductionAnomaly:F2}",
-                    $"{day.AS.ConsumptionAnomaly:F2}",
+                    $"{day.AS.ProductionAnomalyValue:F2}",
+                    $"{day.AS.ConsumptionAnomalyValue:F2}",
                     $"[bold]{day.AS.TotalAnomalyScore:F2}[/]",
                     GetPotentialCause(day)
                 );
@@ -519,8 +519,8 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
     {
         if (day.MS.Precipitation > 5) return "Heavy rain";
         if (day.MS.SunshineHours < 2) return "Low sunshine";
-        if (day.AS.ConsumptionAnomaly > 5) return "High consumption";
-        if (day.AS.ProductionAnomaly < -5) return "Low production";
+        if (day.AS.ConsumptionAnomalyValue > 5) return "High consumption";
+        if (day.AS.ProductionAnomalyValue < -5) return "Low production";
         return "System issue";
     }
 
