@@ -48,6 +48,6 @@ echo "🤖 You can now use: solarscope ai 'your question here'"
 # Run the command if arguments provided
 if [ $# -gt 0 ]; then
     echo "🚀 Running: solarscope $*"
-    solarscope "$@"
+    cd src && dotnet run -- "$@"
     cd ..
 fi

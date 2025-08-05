@@ -41,6 +41,6 @@ if ($args.Count -gt 0) {
     $command = $args -join ' '
     Write-Host "🚀 Running: solarscope $command" -ForegroundColor Magenta
     Set-Location src
-    solarscope $args
+    dotnet run -- $args
     cd ..
 }
