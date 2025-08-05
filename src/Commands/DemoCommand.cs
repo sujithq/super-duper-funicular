@@ -221,7 +221,8 @@ public class DemoCommand : BaseCommand<DemoCommand.Settings>
                     var chart = new BarChart()
                         .Width(60)
                         .Label("[green bold]Daily Production Animation[/]")
-                        .CenterLabel();
+                        .CenterLabel()
+                        .UseValueFormatter(value => $"{value:F1}"); // Ensure consistent 1-decimal formatting
 
                     foreach (var day in recentDays.Take(i))
                     {
@@ -580,7 +581,8 @@ public class DemoCommand : BaseCommand<DemoCommand.Settings>
         var chart = new BarChart()
             .Width(70)
             .Label("[bold]🌈 Rainbow Energy Production Chart 🌈[/]")
-            .CenterLabel();
+            .CenterLabel()
+            .UseValueFormatter(value => $"{value:F1}"); // Ensure consistent 1-decimal formatting
 
         for (int i = 0; i < recentDays.Count; i++)
         {

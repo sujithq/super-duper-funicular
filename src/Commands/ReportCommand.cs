@@ -135,7 +135,8 @@ public class ReportCommand : BaseCommand<ReportCommand.Settings>
             var productionChart = new BarChart()
                 .Width(100)
                 .Label("[bold]Daily Production (kWh)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 1-decimal formatting
 
             foreach (var day in filteredData.Take(20)) // Limit to 20 days for readability
             {
@@ -234,7 +235,8 @@ public class ReportCommand : BaseCommand<ReportCommand.Settings>
             var weeklyChart = new BarChart()
                 .Width(100)
                 .Label("[bold]Weekly Production (kWh)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 1-decimal formatting
 
             foreach (var week in weeklyData.Take(15)) // Show first 15 weeks
             {
@@ -313,7 +315,8 @@ public class ReportCommand : BaseCommand<ReportCommand.Settings>
             var monthlyChart = new BarChart()
                 .Width(100)
                 .Label("[bold]Monthly Production (kWh)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 1-decimal formatting
 
             var monthNames = new[] { "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -393,7 +396,8 @@ public class ReportCommand : BaseCommand<ReportCommand.Settings>
             var yearlyChart = new BarChart()
                 .Width(100)
                 .Label("[bold]Yearly Production Comparison (kWh)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 1-decimal formatting
 
             foreach (var year in data.AvailableYears)
             {

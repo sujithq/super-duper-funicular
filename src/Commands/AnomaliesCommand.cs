@@ -106,7 +106,8 @@ public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
             var severityChart = new BarChart()
                 .Width(80)
                 .Label("[bold]Anomaly Severity Distribution[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F0}"); // Ensure consistent whole number formatting
 
             foreach (var severity in Enum.GetValues<AnomalySeverity>())
             {
@@ -363,7 +364,8 @@ public class AnomaliesCommand : BaseCommand<AnomaliesCommand.Settings>
             var weatherChart = new BarChart()
                 .Width(80)
                 .Label("[bold]Anomalies by Weather Condition[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F0}"); // Ensure consistent whole number formatting
 
             foreach (var weather in weatherBreakdown)
             {

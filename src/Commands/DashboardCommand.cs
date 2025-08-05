@@ -244,7 +244,8 @@ public class DashboardCommand : BaseCommand<DashboardCommand.Settings>
         var chart = new BarChart()
             .Width(80)
             .Label("[green bold]Daily Production (Last 20 Days)[/]")
-            .CenterLabel();
+            .CenterLabel()
+            .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 1-decimal formatting
 
         // Get last 20 days for chart
         var recentDays = data.GetLatestYearDataWithYear().TakeLast(20).ToList();

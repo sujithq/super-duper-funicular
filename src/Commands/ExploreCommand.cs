@@ -383,7 +383,8 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
             var monthlyChart = new BarChart()
                 .Width(80)
                 .Label("[bold]Monthly Production (kWh)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 1-decimal formatting
 
             var monthNames = new[] { "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -433,7 +434,8 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
             var distributionChart = new BarChart()
                 .Width(80)
                 .Label("[bold]Production Distribution (Days per Range)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F0}"); // Ensure consistent whole number formatting
 
             foreach (var (range, count) in productionRanges)
             {
@@ -653,7 +655,8 @@ public class ExploreCommand : AsyncCommand<ExploreCommand.Settings>
             var efficiencyChart = new BarChart()
                 .Width(80)
                 .Label("[bold]Efficiency Distribution (Days per Range)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F0}"); // Ensure consistent whole number formatting
 
             foreach (var (range, count) in efficiencyRanges)
             {

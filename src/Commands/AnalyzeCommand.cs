@@ -105,7 +105,8 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
             var chart = new BarChart()
                 .Width(80)
                 .Label($"[green bold]Top {options.Count} Production Days[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 1-decimal formatting
 
             foreach (var day in topDays)
             {
@@ -117,7 +118,8 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                     _ => Color.Orange1
                 };
 
-                chart.AddItem(day.FormattedDate, day.P, color);
+                // Simple clean labels with consistent value formatting handled by UseValueFormatter
+                chart.AddItem($"{day.FormattedDate}", day.P, color);
             }
 
             AnsiConsole.Write(chart);
@@ -351,7 +353,8 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
             var chart = new BarChart()
                 .Width(70)
                 .Label("[cyan bold]Weather vs Production Correlation[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F2}"); // Ensure consistent 3-decimal formatting for correlations
 
             foreach (var kvp in correlations.OrderByDescending(x => Math.Abs(x.Value)))
             {

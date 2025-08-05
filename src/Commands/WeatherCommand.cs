@@ -121,7 +121,8 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
             var weatherChart = new BarChart()
                 .Width(100)
                 .Label("[bold]Weather Condition Distribution[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F0}"); // Ensure consistent whole number formatting
 
             foreach (var weather in weatherDistribution)
             {
@@ -235,7 +236,8 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
             var correlationChart = new BarChart()
                 .Width(80)
                 .Label("[bold]Weather Factor Correlations with Production[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F3}"); // Ensure consistent 3-decimal formatting
 
             var correlations = new[]
             {
@@ -396,7 +398,8 @@ public class WeatherCommand : AsyncCommand<WeatherCommand.Settings>
             var monthlyChart = new BarChart()
                 .Width(100)
                 .Label("[bold]Monthly Average Temperature (°C)[/]")
-                .CenterLabel();
+                .CenterLabel()
+                .UseValueFormatter(value => $"{value:F1}"); // Ensure consistent 1-decimal formatting
 
             var monthNames = new[] { "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
