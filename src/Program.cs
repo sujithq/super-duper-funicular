@@ -24,6 +24,7 @@ namespace SolarScope
 
             return await Task.Run(() =>
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             // Display welcome banner
             DisplayWelcomeBanner();
 
@@ -37,6 +38,7 @@ namespace SolarScope
                 config.AddCommand<DemoCommand>("demo");
                 config.AddCommand<ExploreCommand>("explore");
                 config.AddCommand<ReportCommand>("report");
+                config.AddCommand<VersionCommand>("version");
                 config.AddCommand<WeatherCommand>("weather");
 
             });
