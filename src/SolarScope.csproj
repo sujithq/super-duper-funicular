@@ -13,7 +13,7 @@
     
     <!-- NuGet Package Metadata -->
     <PackageId>SolarScope</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.2.0</PackageVersion>
     <Authors>Sujith Quintelier</Authors>
     <PackageDescription>A beautiful, interactive command-line tool for monitoring and analyzing solar energy systems with weather correlations and anomaly detection. Built for GitHub's For the Love of Code 2025 hackathon.</PackageDescription>
     <PackageProjectUrl>https://github.com/sujithq/super-duper-funicular</PackageProjectUrl>
