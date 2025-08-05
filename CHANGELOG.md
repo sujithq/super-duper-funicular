@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.1](https://github.com/sujithq/super-duper-funicular/compare/v1.2.0...v1.2.1) (2025-08-05)
+
+
+### Bug Fixes
+
+* **ci:** replace fragile sed script with robust Python for release notes injection ([c29d389](https://github.com/sujithq/super-duper-funicular/commit/c29d38973ee701749883f837cd53391306ac88da))
+
+
+### Chores
+
+* update version and badge in csproj and README.md [skip ci] ([6c99eb4](https://github.com/sujithq/super-duper-funicular/commit/6c99eb4e1b103fd1448ae05a4c385c8d0305937c))
+
 ## [1.2.0](https://github.com/sujithq/super-duper-funicular/compare/v1.1.0...v1.2.0) (2025-08-05)
 
 
