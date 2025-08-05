@@ -186,38 +186,38 @@ src/
 
 ```json
 {
-  "2023": [
+  "2025": [
     {
-      "D": 13,                    // Day of year
-      "P": 12.533,               // Total production (kWh)
-      "U": 10.2,                 // Total consumption (kWh)
-      "I": 2.333,                // Grid injection (kWh)
-      "J": true,                 // January flag
-      "S": false,                // Summer flag
-      "MS": {                    // Weather statistics
-        "tavg": 8.6,             // Average temperature
-        "tmin": 7.5,             // Minimum temperature
-        "tmax": 10.1,            // Maximum temperature
-        "prcp": 0.2,             // Precipitation
-        "snow": 0,               // Snow amount
-        "wdir": 242,             // Wind direction
-        "wspd": 29.7,            // Wind speed
-        "wpgt": 57.4,            // Wind peak gust
-        "pres": 1010,            // Pressure
-        "tsun": 0                // Sunshine hours
+      "D": 1,                    // Day of year (1-366)
+      "P": 0.5,                  // Total daily production (kWh)
+      "U": 45.381,               // Total daily consumption (kWh)
+      "I": 0,                    // Total daily grid injection (Wh)
+      "J": true,                 // System processing flag (can be ignored)
+      "S": true,                 // System processing flag (can be ignored)
+      "MS": {                    // Weather station data
+        "tavg": 7.1,             // Average temperature (°C)
+        "tmin": 5.1,             // Minimum temperature (°C)
+        "tmax": 9.7,             // Maximum temperature (°C)
+        "prcp": 9.8,             // Precipitation (mm)
+        "snow": 0,               // Snow depth (cm)
+        "wdir": 0,               // Wind direction (degrees, 0-360)
+        "wspd": 37.6,            // Wind speed (km/h)
+        "wpgt": 64.8,            // Wind gust peak (km/h)
+        "pres": 1013.9,          // Atmospheric pressure (hPa)
+        "tsun": 0                // Sunshine duration (hours)
       },
-      "M": true,                 // Has measurements flag
-      "AS": {                    // Anomaly statistics
-        "P": 0,                  // Production anomaly
-        "U": 0,                  // Consumption anomaly
-        "I": 0,                  // Injection anomaly
-        "A": false               // Has anomaly flag
+      "M": true,                 // System processing flag (can be ignored)
+      "AS": {                    // Anomaly status
+        "P": 0,                  // Production anomaly value (if detected)
+        "U": 0,                  // Consumption anomaly value (if detected)
+        "I": 0,                  // Injection anomaly value (if detected)
+        "A": false               // Boolean indicating any anomaly detected
       },
-      "Q": {                     // Quarter-hourly data
-        "C": [...],              // Consumption readings
-        "I": [...],              // Injection readings
-        "G": [...],              // Generation readings
-        "P": [],                 // Production readings
+      "Q": {                     // Quarter-hourly data (96 measurements per day)
+        "C": [...],              // Consumption readings (kWh per 15-min)
+        "I": [...],              // Injection readings (Wh per 15-min)
+        "G": [...],              // Gas consumption readings (kWh per 15-min)
+        "P": [...],              // Production readings (kWh per 15-min)
         "WRT": null,             // Water return temperature
         "WOT": null,             // Water outlet temperature
         "WP": null               // Water pressure

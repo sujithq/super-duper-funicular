@@ -587,26 +587,152 @@ solarscope dashboard --data https://example.com/solar-data.json
 solarscope analyze --verbose --type production
 ```
 
-### Data Sources
+### Data Format Specification
 
-The tool expects JSON data in the following format:
+SolarScope CLI expects JSON data organized by year, with detailed daily records containing production, consumption, weather, and quarter-hourly measurements.
+
+#### Complete Sample Data Structure
 
 ```json
 {
-  "2023": [
+  "2025": [
     {
-      "D": 13,
-      "P": 12.533,
-      "U": 10.2,
-      "I": 2.333,
-      "MS": { "tavg": 8.6, "tmin": 7.5, ... },
-      "AS": { "P": 0, "U": 0, "I": 0, "A": false },
-      "Q": { "C": [...], "I": [...], "G": [...] },
-      ...
+      "D": 1,
+      "P": 0.5,
+      "U": 45.381,
+      "I": 0,
+      "J": true,
+      "S": true,
+      "MS": {
+        "tavg": 7.1,
+        "tmin": 5.1,
+        "tmax": 9.7,
+        "prcp": 9.8,
+        "snow": 0,
+        "wdir": 0,
+        "wspd": 37.6,
+        "wpgt": 64.8,
+        "pres": 1013.9,
+        "tsun": 0
+      },
+      "M": true,
+      "AS": {
+        "P": 0,
+        "U": 0,
+        "I": 0,
+        "A": false
+      },
+      "Q": {
+        "C": [
+          0.097, 0.119, 0.117, 0.124, 0.119, 0.106, 0.094, 0.082, 0.073, 0.079,
+          0.064, 0.037, 0.042, 0.044, 0.066, 0.064, 0.057, 0.043, 0.025, 0.026,
+          0.025, 0.04, 0.032, 0.026, 0.027, 0.038, 0.04, 0.035, 0.04, 0.039,
+          0.032, 0.035, 0.059, 0.053, 0.055, 0.047, 0.027, 0.068, 0.056, 0.057,
+          0.063, 0.055, 0.041, 0.161, 0.057, 0.053, 0.395, 0.719, 0.311, 0.085,
+          0.099, 0.103, 0.156, 1.111, 0.848, 0.333, 0.053, 0.067, 0.081, 0.082,
+          0.371, 0.658, 0.143, 0.112, 0.162, 0.152, 0.142, 0.34, 1.809, 1.768,
+          1.721, 1.707, 1.394, 1.319, 1.268, 1.085, 1.095, 1.419, 1.346, 1.3,
+          1.381, 1.308, 1.205, 1.204, 1.196, 1.186, 1.556, 1.145, 1.112, 1.113,
+          1.116, 1.105, 1.084, 1.057, 1.058, 1.062
+        ],
+        "I": [
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0
+        ],
+        "G": [
+          0.29, 0, 0, 4.385, 6.844, 0, 1.659, 0, 3.039, 1.415, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.993,
+          0, 0, 0, 4.802, 3.19, 0, 3.816, 1.798, 1.23, 1.868, 0.974, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          4.617, 6.589, 6.821, 4.408, 2.494, 1.972, 2.018, 1.299, 0, 3.016, 2.088, 3.886, 2.308, 0,
+          0, 0, 3.782, 0, 5.51, 2.042, 1.995, 1.926, 1.125, 0, 2.83, 1.148, 0, 2.877, 0.313, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0.452, 5.208, 3.724, 1.902, 0.22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ],
+        "P": [
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.063, 0.066, 0.059, 0.082, 0.156, 0.202, 0.357, 0.157,
+          0.117, 0.115, 0.123, 0.136, 0.153, 0.114, 0.132, 0.107, 0.117, 0.073, 0.064, 0.093, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0
+        ],
+        "WRT": [],
+        "WOT": [],
+        "WP": []
+      },
+      "C": false,
+      "SRS": {
+        "R": "2025-01-01T07:42:29",
+        "S": "2025-01-01T15:48:08"
+      }
     }
   ]
 }
 ```
+
+#### Field Descriptions
+
+**Top Level Structure:**
+
+- **Year Keys** (`"2025"`, `"2024"`, etc.) - Arrays of daily data records for each year
+
+**Daily Record Fields:**
+
+- **`D`** - Day of year (1-366)
+- **`P`** - Total daily production in kWh
+- **`U`** - Total daily consumption in kWh  
+- **`I`** - Total daily grid injection in Wh (surplus energy fed back to grid)
+- **`J`** - Can be ignored (it is an indication if data for from an source system has been fully processed)
+- **`S`** - Can be ignored (it is an indication if data for from an source system has been fully processed)
+- **`M`** - Can be ignored (it is an indication if data for from an source system has been fully processed)
+- **`C`** - Can be ignored (it is an indication if data for from an source system has been fully processed)
+
+**Weather Station Data (`MS`):**
+
+- **`tavg`** - Average temperature (°C)
+- **`tmin`** - Minimum temperature (°C)
+- **`tmax`** - Maximum temperature (°C)
+- **`prcp`** - Precipitation (mm)
+- **`snow`** - Snow depth (cm)
+- **`wdir`** - Wind direction (degrees, 0-360)
+- **`wspd`** - Wind speed (km/h)
+- **`wpgt`** - Wind gust peak (km/h)
+- **`pres`** - Atmospheric pressure (hPa)
+- **`tsun`** - Sunshine duration (hours)
+
+**Anomaly Status (`AS`):**
+
+- **`P`** - Production value in case there is an anomaly
+- **`U`** - Grid consumption value in case there is an anomaly
+- **`I`** - Injection value in case there is an anomaly
+- **`A`** - Boolean indicating if any anomaly was detected
+
+**Quarter-hourly Data (`Q`)** - 96 measurements per day (every 15 minutes):
+
+- **`C`** - Consumption measurements (kWh per 15-min interval)
+- **`I`** - Injection measurements (Wh per 15-min interval)
+- **`G`** - Gas consumption measurements (kWh per 15-min interval)
+- **`P`** - Production measurements (kWh per 15-min interval)
+- **`WRT`** - Water return temperature (°C) - Optional
+- **`WOT`** - Water outlet temperature (°C) - Optional  
+- **`WP`** - Water pressure (bar) - Optional
+
+**Solar Reference System (`SRS`):**
+
+- **`R`** - Sunrise time (ISO 8601 format)
+- **`S`** - Sunset time (ISO 8601 format)
+
+#### Data Quality Indicators
+
+The system uses several boolean flags to indicate data quality and completeness:
+
+- **Complete Records** (`C` = true) - All measurements for the day are present for system C (can be ignored)
+- **Complete Records** (`J` = true) - All measurements for the day are present for system J
+- **Complete Records** (`S` = true) - All measurements for the day are present for system S
+- **Complete Records** (`M` = true) - All measurements for the day are present for system M
+
+#### Anomaly Classification
+
+When an anomaly is detected, A is true and any of the `P`, `U`, or `I` fields will contain the anomalous value. 
 
 ## 🤝 Contributing
 
